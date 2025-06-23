@@ -427,7 +427,8 @@ test_plan:
     - "Confirm AI integrations with provided API keys"
     - "Test adaptive assessment engine"
     - "Implement advanced AI features (Phase 1)"
-  stuck_tasks: []
+  stuck_tasks: 
+    - "Frontend testing with Playwright"
   test_all: true
   test_priority: "high_first"
 
