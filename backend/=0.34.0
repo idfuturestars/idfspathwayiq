@@ -1,7 +1,7 @@
 Looking in indexes: https://pypi.org/simple, https://d33sy5i8bnduwe.cloudfront.net/simple/
-Requirement already satisfied: speechrecognition in /root/.venv/lib/python3.11/site-packages (3.14.3)
+Requirement already satisfied: SpeechRecognition in /root/.venv/lib/python3.11/site-packages (3.14.3)
 Requirement already satisfied: anthropic in /root/.venv/lib/python3.11/site-packages (0.55.0)
-Requirement already satisfied: typing-extensions in /usr/local/lib/python3.11/site-packages (from speechrecognition) (4.14.0)
+Requirement already satisfied: typing-extensions in /usr/local/lib/python3.11/site-packages (from SpeechRecognition) (4.14.0)
 Requirement already satisfied: anyio<5,>=3.5.0 in /root/.venv/lib/python3.11/site-packages (from anthropic) (4.9.0)
 Requirement already satisfied: distro<2,>=1.7.0 in /root/.venv/lib/python3.11/site-packages (from anthropic) (1.9.0)
 Requirement already satisfied: httpx<1,>=0.25.0 in /root/.venv/lib/python3.11/site-packages (from anthropic) (0.28.1)
