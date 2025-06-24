@@ -1205,10 +1205,7 @@ async def enhanced_ai_chat(
 
 @api_router.post("/ai/personalized-learning-path")
 async def generate_personalized_learning_path(
-    subject: str,
-    learning_goals: List[str],
-    target_completion_weeks: Optional[int] = 8,
-    preferred_learning_style: Optional[str] = None,
+    request: PersonalizedLearningPathRequest,
     current_user: User = Depends(get_current_user)
 ):
     """Generate AI-powered personalized learning path"""
@@ -1225,8 +1222,8 @@ async def generate_personalized_learning_path(
         }
         
         # Detect learning style if not provided
-        if preferred_learning_style:
-            learning_style = LearningStyle(preferred_learning_style)
+        if request.preferred_learning_style:
+            learning_style = LearningStyle(request.preferred_learning_style)
         else:
             # Analyze user's interaction patterns to determine learning style
             recent_interactions = await db.enhanced_ai_conversations.find(
@@ -1237,26 +1234,42 @@ async def generate_personalized_learning_path(
                 combined_text = " ".join([interaction.get("user_message", "") for interaction in recent_interactions])
                 learning_style = advanced_ai_engine.detect_learning_style_from_text(combined_text)
             else:
-                learning_style = LearningStyle.MULTIMODAL
+                learning_style = LearningStyle.MULTIMODAL  # Default
         
         # Generate personalized learning path
         learning_path = await advanced_ai_engine.generate_personalized_learning_path(
-            current_user.id,
-            subject,
-            current_user.level,
-            learning_goals,
+            request.subject,
+            request.learning_goals,
+            performance_data,
             learning_style,
-            performance_data
+            request.target_completion_weeks
         )
         
-        # Store learning path
-        await db.personalized_learning_paths.insert_one(learning_path)
+        # Store the learning path
+        path_data = {
+            "user_id": current_user.id,
+            "subject": request.subject,
+            "learning_goals": request.learning_goals,
+            "learning_style": learning_style.value,
+            "target_weeks": request.target_completion_weeks,
+            "path_structure": learning_path,
+            "created_at": datetime.now(timezone.utc),
+            "status": "active"
+        }
         
-        return learning_path
+        await db.learning_paths.insert_one(path_data)
+        
+        return {
+            "learning_path": learning_path,
+            "learning_style_used": learning_style.value,
+            "estimated_completion": f"{request.target_completion_weeks} weeks",
+            "total_modules": len(learning_path.get("modules", [])),
+            "next_steps": learning_path.get("immediate_next_steps", [])
+        }
         
     except Exception as e:
         logger.error(f"Learning path generation error: {e}")
-        raise HTTPException(status_code=500, detail="Learning path generation failed")
+        raise HTTPException(status_code=500, detail="Failed to generate personalized learning path")
 
 @api_router.get("/ai/emotional-analytics/{user_id}")
 async def get_emotional_analytics(
