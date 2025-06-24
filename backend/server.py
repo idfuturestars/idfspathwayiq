@@ -332,6 +332,27 @@ class UserAnalytics(BaseModel):
     learning_streak: int = 0
     last_updated: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+# Advanced AI Request Models
+class EnhancedChatRequest(BaseModel):
+    message: str
+    emotional_context: Optional[str] = None
+    learning_style: Optional[str] = None
+    ai_personality: Optional[str] = "encouraging"
+    session_id: Optional[str] = None
+
+class PersonalizedLearningPathRequest(BaseModel):
+    subject: str
+    learning_goals: List[str]
+    target_completion_weeks: Optional[int] = 8
+    preferred_learning_style: Optional[str] = None
+
+class LearningStyleAssessmentRequest(BaseModel):
+    responses: List[Dict[str, Any]]
+
+class VoiceToTextRequest(BaseModel):
+    audio_data: str  # base64 encoded audio
+    session_context: Optional[Dict[str, Any]] = None
+
 # ============================================================================
 # AUTHENTICATION UTILITIES
 # ============================================================================
