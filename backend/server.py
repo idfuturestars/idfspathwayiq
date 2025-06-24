@@ -984,13 +984,113 @@ async def join_study_group(group_id: str, current_user: User = Depends(get_curre
 
 @api_router.post("/quiz-rooms", response_model=QuizRoom)
 async def create_quiz_room(room_data: QuizRoomCreate, current_user: User = Depends(get_current_user)):
-    room_dict = room_data.dict()
-    room_dict["created_by"] = current_user.id
-    room_dict["participants"] = [current_user.id]
-    
-    quiz_room = QuizRoom(**room_dict)
-    await db.quiz_rooms.insert_one(quiz_room.dict())
-    return quiz_room
+    """Create AI-powered quiz room with dynamic question generation"""
+    try:
+        room_dict = room_data.dict()
+        room_dict["id"] = str(uuid.uuid4())
+        room_dict["created_by"] = current_user.id
+        room_dict["participants"] = [current_user.id]
+        room_dict["created_at"] = datetime.now(timezone.utc)
+        room_dict["room_code"] = str(uuid.uuid4())[:8].upper()
+        
+        # AI-powered quiz features
+        try:
+            # Generate AI-powered quiz questions
+            quiz_questions_response = await openai.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are an AI quiz generator. Create engaging, educational quiz questions with multiple choice answers."},
+                    {"role": "user", "content": f"Generate {room_data.questions_per_game} {room_data.difficulty.value} level multiple choice questions about {room_data.subject}. For each question provide: question text, 4 options (A,B,C,D), correct answer, and brief explanation. Format as JSON."}
+                ],
+                max_tokens=1500,
+                temperature=0.7
+            )
+            
+            ai_questions = quiz_questions_response.choices[0].message.content
+            room_dict["ai_questions"] = ai_questions
+            room_dict["ai_generated"] = True
+            
+        except Exception as e:
+            logger.warning(f"AI question generation failed: {e}")
+            room_dict["ai_questions"] = "Questions will be loaded from the question bank."
+            room_dict["ai_generated"] = False
+        
+        quiz_room = QuizRoom(**room_dict)
+        await db.quiz_rooms.insert_one(room_dict)
+        return quiz_room
+        
+    except Exception as e:
+        logger.error(f"Failed to create quiz room: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create quiz room")
+
+@api_router.get("/quiz-rooms", response_model=List[QuizRoom])
+async def get_quiz_rooms(current_user: User = Depends(get_current_user)):
+    """Get available quiz rooms with AI insights"""
+    try:
+        rooms = await db.quiz_rooms.find({"is_active": True}).to_list(100)
+        return [QuizRoom(**r) for r in rooms]
+    except Exception as e:
+        logger.error(f"Failed to get quiz rooms: {e}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve quiz rooms")
+
+@api_router.post("/quiz-rooms/{room_id}/join")
+async def join_quiz_room(room_id: str, current_user: User = Depends(get_current_user)):
+    """Join quiz room with AI-powered matchmaking"""
+    try:
+        room = await db.quiz_rooms.find_one({"id": room_id})
+        if not room:
+            raise HTTPException(status_code=404, detail="Quiz room not found")
+        
+        if current_user.id in room["participants"]:
+            raise HTTPException(status_code=400, detail="Already a participant")
+        
+        if len(room["participants"]) >= room["max_participants"]:
+            raise HTTPException(status_code=400, detail="Room is full")
+        
+        # Update room participation
+        await db.quiz_rooms.update_one(
+            {"id": room_id},
+            {"$push": {"participants": current_user.id}}
+        )
+        
+        # AI-powered competitor analysis
+        try:
+            # Get user's performance data for matchmaking insights
+            user_answers = await db.user_answers.find({"user_id": current_user.id}).to_list(50)
+            avg_score = sum(answer.get("points_earned", 0) for answer in user_answers) / max(len(user_answers), 1)
+            
+            matchmaking_response = await openai.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are an AI quiz coordinator. Provide motivational pre-game analysis."},
+                    {"role": "user", "content": f"User {current_user.full_name} (avg score: {avg_score:.1f}) joined {room['subject']} quiz room '{room['name']}' with {len(room['participants'])} participants. Create encouraging pre-game message."}
+                ],
+                max_tokens=200,
+                temperature=0.8
+            )
+            
+            matchmaking_message = matchmaking_response.choices[0].message.content
+            
+            return {
+                "message": "Successfully joined quiz room", 
+                "room_code": room["room_code"],
+                "ai_analysis": matchmaking_message,
+                "participants_count": len(room["participants"]) + 1
+            }
+            
+        except Exception as e:
+            logger.warning(f"AI matchmaking analysis failed: {e}")
+            return {
+                "message": "Successfully joined quiz room", 
+                "room_code": room["room_code"],
+                "participants_count": len(room["participants"]) + 1
+            }
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to join quiz room: {e}")
+        raise HTTPException(status_code=500, detail="Failed to join quiz room")
 
 @api_router.get("/quiz-rooms", response_model=List[QuizRoom])
 async def get_quiz_rooms(current_user: User = Depends(get_current_user)):
