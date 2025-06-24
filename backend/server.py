@@ -871,40 +871,112 @@ async def submit_answer(
 
 @api_router.post("/study-groups", response_model=StudyGroup)
 async def create_study_group(group_data: StudyGroupCreate, current_user: User = Depends(get_current_user)):
-    group_dict = group_data.dict()
-    group_dict["created_by"] = current_user.id
-    group_dict["members"] = [current_user.id]
-    
-    if group_data.is_private:
-        group_dict["join_code"] = str(uuid.uuid4())[:8].upper()
-    
-    study_group = StudyGroup(**group_dict)
-    await db.study_groups.insert_one(study_group.dict())
-    return study_group
+    """Create a new study group with AI-powered features"""
+    try:
+        group_dict = group_data.dict()
+        group_dict["id"] = str(uuid.uuid4())
+        group_dict["created_by"] = current_user.id
+        group_dict["members"] = [current_user.id]
+        group_dict["created_at"] = datetime.now(timezone.utc)
+        
+        if group_data.is_private:
+            group_dict["join_code"] = str(uuid.uuid4())[:8].upper()
+        
+        # AI-powered group features
+        try:
+            # Generate AI-powered study recommendations for the group
+            study_recommendations = await openai.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are an AI study coordinator. Generate personalized study recommendations for study groups."},
+                    {"role": "user", "content": f"Create study recommendations for a {group_data.subject} study group called '{group_data.name}'. Description: {group_data.description}. Provide 5 specific study activities, learning goals, and collaboration strategies."}
+                ],
+                max_tokens=500,
+                temperature=0.7
+            )
+            
+            ai_recommendations = study_recommendations.choices[0].message.content
+            group_dict["ai_study_plan"] = ai_recommendations
+            group_dict["ai_generated"] = True
+            
+        except Exception as e:
+            logger.warning(f"AI recommendations failed for study group: {e}")
+            group_dict["ai_study_plan"] = f"Welcome to {group_data.name}! Here's a great place to collaborate on {group_data.subject} topics."
+            group_dict["ai_generated"] = False
+        
+        study_group = StudyGroup(**group_dict)
+        await db.study_groups.insert_one(group_dict)
+        return study_group
+        
+    except Exception as e:
+        logger.error(f"Failed to create study group: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create study group")
 
 @api_router.get("/study-groups", response_model=List[StudyGroup])
 async def get_study_groups(current_user: User = Depends(get_current_user)):
-    groups = await db.study_groups.find({"members": current_user.id}).to_list(100)
-    return [StudyGroup(**g) for g in groups]
+    """Get all study groups for current user with AI insights"""
+    try:
+        groups = await db.study_groups.find({"members": current_user.id}).to_list(100)
+        return [StudyGroup(**g) for g in groups]
+    except Exception as e:
+        logger.error(f"Failed to get study groups: {e}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve study groups")
 
 @api_router.post("/study-groups/{group_id}/join")
 async def join_study_group(group_id: str, current_user: User = Depends(get_current_user)):
-    group = await db.study_groups.find_one({"id": group_id})
-    if not group:
-        raise HTTPException(status_code=404, detail="Study group not found")
-    
-    if current_user.id in group["members"]:
-        raise HTTPException(status_code=400, detail="Already a member")
-    
-    if len(group["members"]) >= group["max_members"]:
-        raise HTTPException(status_code=400, detail="Group is full")
-    
-    await db.study_groups.update_one(
-        {"id": group_id},
-        {"$push": {"members": current_user.id}}
-    )
-    
-    return {"message": "Successfully joined study group"}
+    """Join a study group with AI-powered onboarding"""
+    try:
+        group = await db.study_groups.find_one({"id": group_id})
+        if not group:
+            raise HTTPException(status_code=404, detail="Study group not found")
+        
+        if current_user.id in group["members"]:
+            raise HTTPException(status_code=400, detail="Already a member")
+        
+        if len(group["members"]) >= group["max_members"]:
+            raise HTTPException(status_code=400, detail="Group is full")
+        
+        # Update group membership
+        await db.study_groups.update_one(
+            {"id": group_id},
+            {"$push": {"members": current_user.id}}
+        )
+        
+        # AI-powered welcome message
+        try:
+            welcome_response = await openai.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a friendly AI study group coordinator. Welcome new members warmly."},
+                    {"role": "user", "content": f"Welcome {current_user.full_name} to the {group['name']} study group focused on {group['subject']}. Create a personalized welcome message with study tips."}
+                ],
+                max_tokens=200,
+                temperature=0.8
+            )
+            
+            welcome_message = welcome_response.choices[0].message.content
+            
+            # Store welcome interaction
+            await db.study_group_interactions.insert_one({
+                "group_id": group_id,
+                "user_id": current_user.id,
+                "interaction_type": "member_joined",
+                "message": welcome_message,
+                "timestamp": datetime.now(timezone.utc),
+                "ai_generated": True
+            })
+            
+            return {"message": "Successfully joined study group", "welcome_message": welcome_message}
+            
+        except Exception as e:
+            logger.warning(f"AI welcome message failed: {e}")
+            return {"message": "Successfully joined study group"}
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to join study group: {e}")
+        raise HTTPException(status_code=500, detail="Failed to join study group")
 
 # ============================================================================
 # QUIZ ARENA ENDPOINTS
