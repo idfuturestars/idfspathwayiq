@@ -1442,7 +1442,7 @@ async def conduct_learning_style_assessment(
         secondary_style = sorted_styles[1][0] if len(sorted_styles) > 1 and sorted_styles[1][1] > 0 else None
         
         # Generate personalized recommendations
-        recommendations = {
+        recommendations_map = {
             LearningStyle.VISUAL: [
                 "Use diagrams, charts, and mind maps when studying",
                 "Watch educational videos and visual demonstrations",
@@ -1466,6 +1466,12 @@ async def conduct_learning_style_assessment(
                 "Write summaries and outlines",
                 "Read extensively on topics",
                 "Use written practice problems"
+            ],
+            LearningStyle.MULTIMODAL: [
+                "Combine visual, auditory, and kinesthetic learning",
+                "Use various study methods for different topics",
+                "Adapt your approach based on the material",
+                "Experiment with different learning techniques"
             ]
         }
         
@@ -1477,7 +1483,7 @@ async def conduct_learning_style_assessment(
             "style_distribution": {style.value: score for style, score in learning_style_indicators.items()},
             "confidence_score": min(100, max(10, sorted_styles[0][1] * 10)),
             "data_points_analyzed": len(voice_interactions) + len(ai_conversations) + len(user_answers),
-            "recommendations": recommendations.get(primary_style, []),
+            "recommendations": recommendations_map.get(primary_style, recommendations_map[LearningStyle.MULTIMODAL]),
             "assessment_date": datetime.now(timezone.utc)
         }
         
