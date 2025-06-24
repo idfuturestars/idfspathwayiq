@@ -73,9 +73,6 @@ app.add_middleware(
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# ============================================================================
-# MODELS & ENUMS
-# ============================================================================
 
 class UserRole(str, Enum):
     STUDENT = "student"
