@@ -77,6 +77,33 @@ logger = logging.getLogger(__name__)
 # COMPREHENSIVE 60-MINUTE ASSESSMENT SYSTEM (IDFS METEY METHOD)
 # ============================================================================
 
+class ComprehensiveAssessmentConfig(BaseModel):
+    user_grade_level: str  # "6th_grade", "8th_grade", etc.
+    assessment_duration: int = 60  # minutes
+    enable_think_aloud: bool = True
+    enable_ai_ethics_scenarios: bool = True
+    enable_real_world_scenarios: bool = True
+    adaptive_difficulty: bool = True
+
+class AssessmentQuestion(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    question_text: str
+    question_type: str  # "mcq", "open_ended", "scenario_based", "ai_ethics"
+    options: Optional[List[str]] = None
+    correct_answer: Optional[str] = None
+    explanation: str
+    difficulty_level: str
+    subject: str
+    grade_level: str
+    real_world_context: Optional[str] = None
+    ai_ethics_component: Optional[str] = None
+    think_aloud_prompt: Optional[str] = None
+    estimated_time: int = 3  # minutes per question
+
+# ============================================================================
+# VOICE-TO-TEXT INTEGRATION SYSTEM  
+# ============================================================================
+
 class UserRole(str, Enum):
     STUDENT = "student"
     TEACHER = "teacher"
