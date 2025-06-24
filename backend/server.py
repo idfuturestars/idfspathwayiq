@@ -73,6 +73,9 @@ app.add_middleware(
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# ============================================================================
+# COMPREHENSIVE 60-MINUTE ASSESSMENT SYSTEM (IDFS METEY METHOD)
+# ============================================================================
 
 class UserRole(str, Enum):
     STUDENT = "student"
