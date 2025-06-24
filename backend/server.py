@@ -1484,12 +1484,20 @@ async def conduct_learning_style_assessment(
             "confidence_score": min(100, max(10, sorted_styles[0][1] * 10)),
             "data_points_analyzed": len(voice_interactions) + len(ai_conversations) + len(user_answers),
             "recommendations": recommendations_map.get(primary_style, recommendations_map[LearningStyle.MULTIMODAL]),
-            "assessment_date": datetime.now(timezone.utc)
+            "assessment_date": datetime.now(timezone.utc).isoformat()
         }
         
         await db.learning_style_assessments.insert_one(assessment_result)
         
-        return assessment_result
+        # Return without _id to avoid ObjectId serialization issues
+        return {
+            "primary_learning_style": primary_style.value,
+            "secondary_learning_style": secondary_style.value if secondary_style else None,
+            "confidence_score": min(100, max(10, sorted_styles[0][1] * 10)),
+            "recommendations": recommendations_map.get(primary_style, recommendations_map[LearningStyle.MULTIMODAL]),
+            "data_points_analyzed": len(voice_interactions) + len(ai_conversations) + len(user_answers),
+            "assessment_date": datetime.now(timezone.utc).isoformat()
+        }
         
     except Exception as e:
         logger.error(f"Learning style assessment error: {e}")
