@@ -1140,29 +1140,25 @@ async def process_voice_input(
 
 @api_router.post("/ai/enhanced-chat")
 async def enhanced_ai_chat(
-    message: str,
-    emotional_context: Optional[str] = None,
-    learning_style: Optional[str] = None,
-    ai_personality: Optional[str] = "encouraging",
-    session_id: Optional[str] = None,
+    request: EnhancedChatRequest,
     current_user: User = Depends(get_current_user)
 ):
     """Enhanced AI chat with emotional intelligence and adaptive responses"""
     try:
-        if not session_id:
-            session_id = str(uuid.uuid4())
+        if not request.session_id:
+            request.session_id = str(uuid.uuid4())
         
         # Detect emotional state if not provided
-        if emotional_context:
-            emotional_state = EmotionalState(emotional_context)
+        if request.emotional_context:
+            emotional_state = EmotionalState(request.emotional_context)
         else:
-            emotional_state = await advanced_ai_engine.detect_emotional_state(message)
+            emotional_state = await advanced_ai_engine.detect_emotional_state(request.message)
         
         # Detect learning style if not provided
-        if learning_style:
-            user_learning_style = LearningStyle(learning_style)
+        if request.learning_style:
+            user_learning_style = LearningStyle(request.learning_style)
         else:
-            user_learning_style = advanced_ai_engine.detect_learning_style_from_text(message)
+            user_learning_style = advanced_ai_engine.detect_learning_style_from_text(request.message)
         
         # Get user context
         user_context = {
@@ -1173,20 +1169,20 @@ async def enhanced_ai_chat(
         }
         
         # Generate adaptive response
-        ai_personality_enum = AIPersonality(ai_personality)
+        ai_personality_enum = AIPersonality(request.ai_personality)
         response = await advanced_ai_engine.generate_adaptive_response(
-            message, user_context, emotional_state, user_learning_style, ai_personality_enum
+            request.message, user_context, emotional_state, user_learning_style, ai_personality_enum
         )
         
         # Store enhanced conversation
         conversation_data = {
             "user_id": current_user.id,
-            "session_id": session_id,
-            "user_message": message,
+            "session_id": request.session_id,
+            "user_message": request.message,
             "ai_response": response["response"],
             "emotional_state": emotional_state.value,
             "learning_style": user_learning_style.value,
-            "ai_personality": ai_personality,
+            "ai_personality": request.ai_personality,
             "adaptations_applied": response.get("adaptations_applied", []),
             "timestamp": datetime.now(timezone.utc)
         }
@@ -1194,11 +1190,11 @@ async def enhanced_ai_chat(
         await db.enhanced_ai_conversations.insert_one(conversation_data)
         
         return {
-            "session_id": session_id,
+            "session_id": request.session_id,
             "response": response["response"],
             "emotional_state_detected": emotional_state.value,
             "learning_style_detected": user_learning_style.value,
-            "ai_personality_used": ai_personality,
+            "ai_personality_used": request.ai_personality,
             "adaptations_applied": response.get("adaptations_applied", []),
             "next_suggestions": response.get("next_suggestions", [])
         }
