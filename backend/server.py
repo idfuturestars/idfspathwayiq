@@ -1349,11 +1349,36 @@ async def get_emotional_analytics(
 
 @api_router.post("/ai/learning-style-assessment")
 async def conduct_learning_style_assessment(
+    request: LearningStyleAssessmentRequest,
     current_user: User = Depends(get_current_user)
 ):
     """Conduct a comprehensive learning style assessment"""
     try:
-        # Get user's historical interaction data
+        # Process user responses
+        style_scores = {
+            "visual": 0,
+            "auditory": 0,
+            "kinesthetic": 0,
+            "reading_writing": 0,
+            "multimodal": 0
+        }
+        
+        # Calculate scores from user responses
+        for response in request.responses:
+            question = response.get("question", "")
+            answer = response.get("answer", 0)
+            
+            # Map questions to learning styles (simplified scoring)
+            if "visual" in question.lower() or "picture" in question.lower() or "diagram" in question.lower():
+                style_scores["visual"] += answer
+            elif "audio" in question.lower() or "listen" in question.lower() or "sound" in question.lower():
+                style_scores["auditory"] += answer
+            elif "kinesthetic" in question.lower() or "movement" in question.lower() or "hands" in question.lower():
+                style_scores["kinesthetic"] += answer
+            elif "reading" in question.lower() or "writing" in question.lower() or "text" in question.lower():
+                style_scores["reading_writing"] += answer
+        
+        # Get user's historical interaction data for additional context
         voice_interactions = await db.voice_interactions.find(
             {"user_id": current_user.id}
         ).to_list(100)
@@ -1368,11 +1393,11 @@ async def conduct_learning_style_assessment(
         
         # Analyze patterns across all interactions
         learning_style_indicators = {
-            LearningStyle.VISUAL: 0,
-            LearningStyle.AUDITORY: 0,
-            LearningStyle.KINESTHETIC: 0,
-            LearningStyle.READING_WRITING: 0,
-            LearningStyle.MULTIMODAL: 0
+            LearningStyle.VISUAL: style_scores["visual"],
+            LearningStyle.AUDITORY: style_scores["auditory"],
+            LearningStyle.KINESTHETIC: style_scores["kinesthetic"],
+            LearningStyle.READING_WRITING: style_scores["reading_writing"],
+            LearningStyle.MULTIMODAL: style_scores["multimodal"]
         }
         
         # Analyze voice interactions
