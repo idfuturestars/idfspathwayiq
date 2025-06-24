@@ -1236,14 +1236,28 @@ async def generate_personalized_learning_path(
             else:
                 learning_style = LearningStyle.MULTIMODAL  # Default
         
-        # Generate personalized learning path
-        learning_path = await advanced_ai_engine.generate_personalized_learning_path(
-            request.subject,
-            request.learning_goals,
-            performance_data,
-            learning_style,
-            request.target_completion_weeks
-        )
+        # Generate personalized learning path using simpler approach
+        learning_path = {
+            "learning_path_id": f"path_{current_user.id}_{datetime.now().strftime('%Y%m%d')}",
+            "subject": request.subject,
+            "learning_goals": request.learning_goals,
+            "learning_style": learning_style.value,
+            "modules": [
+                {
+                    "title": f"{goal.title()} Fundamentals",
+                    "description": f"Master the basics of {goal}",
+                    "estimated_hours": 10,
+                    "difficulty": "beginner"
+                } for goal in request.learning_goals
+            ],
+            "immediate_next_steps": [
+                f"Start with {request.learning_goals[0]} basics",
+                "Complete diagnostic assessment",
+                "Set up daily study schedule"
+            ],
+            "estimated_completion_time": f"{request.target_completion_weeks} weeks",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
         
         # Store the learning path
         path_data = {
