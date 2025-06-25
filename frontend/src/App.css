@@ -1,41 +1,190 @@
-/* StarGuide App Styles */
+/* StarGuide Mobile-First Responsive Styles */
+
+/* CSS Reset for cross-browser compatibility */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Root variables for consistent theming */
+:root {
+  --starguide-primary: #4C1D95;
+  --starguide-secondary: #7C3AED;
+  --starguide-accent: #F59E0B;
+  --starguide-dark: #0F172A;
+  --starguide-light: #F8FAFC;
+  --touch-target-size: 44px;
+}
+
 .App {
   text-align: center;
-  background-color: #0a0a0a;
+  background-color: var(--starguide-dark);
   min-height: 100vh;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+  min-height: 100svh; /* Mobile viewport units */
+  
+  /* Mobile optimization */
+  @media (max-width: 768px) {
+    font-size: 16px; /* Prevent zoom on iOS */
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
   }
 }
 
+/* Mobile-optimized header */
 .App-header {
-  background-color: #0a0a0a;
+  background-color: var(--starguide-dark);
   padding: 20px;
   color: white;
   min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
+  
+  /* Mobile responsive adjustments */
+  @media (max-width: 768px) {
+    padding: 16px;
+    font-size: calc(14px + 2vmin);
+    min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
 }
 
+/* Touch-friendly links and buttons */
 .App-link {
-  color: #4CAF50;
+  color: var(--starguide-accent);
   text-decoration: none;
   transition: color 0.3s ease;
+  min-height: var(--touch-target-size);
+  min-width: var(--touch-target-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 8px;
 }
 
-.App-link:hover {
-  color: #45a049;
+.App-link:hover,
+.App-link:focus {
+  color: #E59500;
+  outline: 2px solid var(--starguide-accent);
+  outline-offset: 2px;
+}
+
+/* Mobile-optimized forms */
+.form-input {
+  font-size: 16px !important; /* Prevent zoom on iOS */
+  min-height: var(--touch-target-size);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #374151;
+  background-color: #1F2937;
+  color: white;
+  width: 100%;
+  
+  @media (max-width: 768px) {
+    padding: 14px 16px; /* Larger touch targets on mobile */
+  }
+}
+
+/* Mobile-optimized buttons */
+.btn-primary,
+.btn-secondary {
+  min-height: var(--touch-target-size);
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  
+  @media (max-width: 768px) {
+    min-height: 48px; /* Larger touch targets */
+    padding: 14px 28px;
+    font-size: 16px;
+    width: 100%; /* Full width on mobile */
+  }
+}
+
+.btn-primary {
+  background-color: var(--starguide-primary);
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #3B1475;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 29, 149, 0.3);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--starguide-secondary);
+  border: 2px solid var(--starguide-secondary);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: var(--starguide-secondary);
+  color: white;
+}
+
+/* Responsive cards */
+.starguide-card {
+  background-color: #1F2937;
+  border: 1px solid #374151;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 16px 0;
+  transition: all 0.3s ease;
+  
+  @media (max-width: 768px) {
+    padding: 16px;
+    margin: 12px 0;
+    border-radius: 8px;
+  }
+}
+
+.starguide-card:hover {
+  border-color: var(--starguide-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile navigation */
+.mobile-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--starguide-dark);
+  border-top: 1px solid #374151;
+  padding: env(safe-area-inset-bottom) 0 8px 0;
+  z-index: 50;
+  
+  @media (min-width: 769px) {
+    display: none;
+  }
+}
+
+/* Loading states */
+.loading-spinner {
+  border: 2px solid #374151;
+  border-top: 2px solid var(--starguide-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @keyframes App-logo-spin {
@@ -47,7 +196,103 @@
   }
 }
 
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .starguide-card {
+    border-width: 2px;
+    border-color: white;
+  }
+  
+  .btn-primary,
+  .btn-secondary {
+    border-width: 2px;
+  }
+}
+
+/* Focus styles for keyboard navigation */
+*:focus {
+  outline: 2px solid var(--starguide-accent);
+  outline-offset: 2px;
+}
+
+/* Responsive text sizes */
+.text-responsive {
+  font-size: clamp(14px, 4vw, 18px);
+}
+
+.heading-responsive {
+  font-size: clamp(24px, 6vw, 48px);
+}
+
+/* Safe area handling for iOS */
+.safe-area-container {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Cross-browser compatibility fixes */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 8px;
+}
+
+/* Prevent horizontal scroll on mobile */
+body {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure touch targets are accessible */
+button,
+a,
+input,
+select,
+textarea {
+  min-height: var(--touch-target-size);
+  min-width: var(--touch-target-size);
+}
+
 /* Additional utility classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.mobile-hidden {
+  @media (max-width: 768px) {
+    display: none !important;
+  }
+}
+
+.mobile-only {
+  @media (min-width: 769px) {
+    display: none !important;
+  }
+}
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
