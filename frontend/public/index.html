@@ -2,37 +2,152 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="description" content="A product of emergent.sh" />
-        <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-        <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
-
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-        <title>Emergent | Fullstack App</title>
+        <!-- Enhanced mobile viewport configuration -->
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover, user-scalable=no" />
+        
+        <!-- iOS Safari optimizations -->
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="StarGuide IDFS" />
+        
+        <!-- Theme colors for different browsers -->
+        <meta name="theme-color" content="#4C1D95" />
+        <meta name="msapplication-TileColor" content="#4C1D95" />
+        <meta name="msapplication-navbutton-color" content="#4C1D95" />
+        
+        <!-- Enhanced meta description for SEO -->
+        <meta name="description" content="StarGuide IDFS - AI-Powered Educational Assessment Platform for Advanced Learning and AI Readiness" />
+        <meta name="keywords" content="AI education, adaptive assessment, learning analytics, educational technology, StarGuide" />
+        
+        <!-- Open Graph meta tags for social sharing -->
+        <meta property="og:title" content="StarGuide IDFS - AI Educational Platform" />
+        <meta property="og:description" content="Advanced AI-powered educational assessment and learning platform" />
+        <meta property="og:type" content="website" />
+        
+        <!-- Preload critical resources for performance -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        
+        <!-- Enhanced fonts for better readability -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+        
+        <!-- Enhanced favicon set -->
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        
+        <!-- Web App Manifest -->
+        <link rel="manifest" href="/manifest.json" />
+        
+        <!-- Prevent zoom on iOS when focusing inputs -->
+        <style>
+            @media (max-width: 768px) {
+                input, textarea, select {
+                    font-size: 16px !important;
+                    transform: translateZ(0);
+                    -webkit-appearance: none;
+                    border-radius: 0;
+                }
+            }
+            
+            /* Critical CSS for faster loading */
+            body {
+                margin: 0;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                background-color: #0F172A;
+                color: #F8FAFC;
+                overflow-x: hidden;
+                -webkit-overflow-scrolling: touch;
+                touch-action: manipulation;
+            }
+            
+            /* Loading screen */
+            .loading-screen {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #0F172A;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            }
+            
+            .loading-spinner {
+                width: 40px;
+                height: 40px;
+                border: 3px solid #374151;
+                border-top: 3px solid #F59E0B;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+            
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+        
+        <title>StarGuide IDFS - AI Educational Platform</title>
     </head>
     <body>
-        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <!-- Loading screen for better UX -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-spinner"></div>
+            <p style="margin-top: 20px; color: #F59E0B; font-weight: 500;">Loading StarGuide...</p>
+        </div>
+        
+        <noscript>
+            <div style="padding: 20px; text-align: center; background-color: #EF4444; color: white;">
+                <h2>JavaScript Required</h2>
+                <p>You need to enable JavaScript to run StarGuide IDFS Educational Platform.</p>
+            </div>
+        </noscript>
+        
         <div id="root"></div>
-        <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+        
+        <!-- Remove loading screen when app loads -->
+        <script>
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    const loadingScreen = document.getElementById('loading-screen');
+                    if (loadingScreen) {
+                        loadingScreen.style.opacity = '0';
+                        loadingScreen.style.transition = 'opacity 0.3s ease';
+                        setTimeout(function() {
+                            loadingScreen.remove();
+                        }, 300);
+                    }
+                }, 500);
+            });
+            
+            // Enhanced error handling
+            window.addEventListener('error', function(e) {
+                console.error('StarGuide Error:', e.error);
+            });
+            
+            // Service Worker registration for PWA capabilities
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(function(registration) {
+                            console.log('SW registered: ', registration);
+                        })
+                        .catch(function(registrationError) {
+                            console.log('SW registration failed: ', registrationError);
+                        });
+                });
+            }
+        </script>
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+        <!-- Emergent badge - mobile optimized -->
         <a
             id="emergent-badge"
             target="_blank"
@@ -45,41 +160,32 @@
                 right: 20px;
                 text-decoration: none;
                 padding: 6px 10px;
-                font-family: -apple-system, BlinkMacSystemFont,
-                    &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell,
-                    &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;,
-                    sans-serif !important;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
                 font-size: 12px !important;
                 z-index: 9999 !important;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
                 border-radius: 8px !important;
                 background-color: #ffffff !important;
                 border: 1px solid rgba(255, 255, 255, 0.25) !important;
+                min-height: 44px; /* Touch-friendly */
+                transition: transform 0.2s ease;
             "
+            onmouseover="this.style.transform='scale(1.05)'"
+            onmouseout="this.style.transform='scale(1)'"
         >
-            <div
-                style="display: flex; flex-direction: row; align-items: center"
-            >
+            <div style="display: flex; flex-direction: row; align-items: center">
                 <img
                     style="width: 20px; height: 20px; margin-right: 8px"
                     src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4"
+                    alt="Emergent Logo"
                 />
-                <p
-                    style="
-                        color: #000000;
-                        font-family: -apple-system, BlinkMacSystemFont,
-                            &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu,
-                            Cantarell, &quot;Open Sans&quot;,
-                            &quot;Helvetica Neue&quot;, sans-serif !important;
-                        font-size: 12px !important;
-                        align-items: center;
-                        margin-bottom: 0;
-                    "
-                >
+                <p style="color: #000000; font-size: 12px !important; margin: 0;">
                     Made with Emergent
                 </p>
             </div>
         </a>
+
+        <!-- Analytics - PostHog -->
         <script>
             !(function (t, e) {
                 var o, n, p, r;
@@ -144,7 +250,7 @@
             })(document, window.posthog || []);
             posthog.init("phc_yJW1VjHGGwmCbbrtczfqqNxgBDbhlhOWcdzcIJEOTFE", {
                 api_host: "https://us.i.posthog.com",
-                person_profiles: "identified_only", // or 'always' to create profiles for anonymous users as well
+                person_profiles: "identified_only",
             });
         </script>
     </body>
