@@ -60,13 +60,22 @@ security = HTTPBearer()
 app = FastAPI(title="StarGuide API", description="IDFS PathwayIQ™ Educational Platform")
 api_router = APIRouter(prefix="/api")
 
-# CORS middleware
+# CORS Configuration - Updated for stargateai.emergent.host
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "https://localhost:3000", 
+        "https://dfa0127a-8eb9-4c85-a9f1-cf762a6336a2.preview.emergentagent.com",
+        "https://stargateai.emergent.host",  # New domain
+        "https://emergency-stargate.emergent.host",  # Alternative domain
+        "https://*.emergent.host",  # Wildcard for emergent subdomains
+        "https://*.emergentagent.com"  # Current working domain
+    ],
     allow_credentials=True,
-    allow_origins=["*"],
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 # Logging setup
