@@ -14,7 +14,7 @@ import os
 from datetime import datetime
 
 # Get the backend URL from the frontend .env file
-BACKEND_URL = "https://dfa0127a-8eb9-4c85-a9f1-cf762a6336a2.preview.emergentagent.com/api"
+BACKEND_URL = "https://76b382ff-b491-4ce5-91e0-b22087b7f6c7.preview.emergentagent.com/api"
 
 class StarGuideBackendTest(unittest.TestCase):
     """Test suite for StarGuide backend API"""
