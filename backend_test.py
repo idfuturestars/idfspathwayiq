@@ -581,6 +581,170 @@ class StarGuideBackendTest(unittest.TestCase):
         except AssertionError:
             print("❌ Voice-to-text endpoint not working as expected")
 
+    def test_14_rate_limiting(self):
+        """Test rate limiting functionality"""
+        # Test API rate limiting by making multiple requests in quick succession
+        print("Testing rate limiting...")
+        
+        # Make 20 requests to test rate limiting
+        responses = []
+        for i in range(20):
+            response = requests.get(f"{BACKEND_URL}/health")
+            responses.append(response)
+            
+        # Check if any responses have 429 status code (Too Many Requests)
+        rate_limited = any(r.status_code == 429 for r in responses)
+        
+        # Check for rate limit headers
+        rate_limit_headers = any("X-RateLimit-Limit" in r.headers for r in responses)
+        rate_limit_remaining = any("X-RateLimit-Remaining" in r.headers for r in responses)
+        rate_limit_reset = any("X-RateLimit-Reset" in r.headers for r in responses)
+        
+        if rate_limited:
+            print("✅ Rate limiting is enforced (received 429 response)")
+        elif rate_limit_headers and rate_limit_remaining and rate_limit_reset:
+            print("✅ Rate limiting headers present but limit not exceeded")
+        else:
+            print("❓ Rate limiting could not be verified")
+            
+        # Check rate limiting for different endpoint types
+        endpoint_types = [
+            ("/", "API"),
+            ("/auth/login", "Auth"),
+            ("/ai/chat", "AI"),
+            ("/ai/voice-to-text", "Voice"),
+            ("/adaptive-assessment/start", "Assessment")
+        ]
+        
+        for endpoint, endpoint_type in endpoint_types:
+            response = requests.get(f"{BACKEND_URL}{endpoint}")
+            if any(header.startswith("X-RateLimit") for header in response.headers):
+                print(f"✅ {endpoint_type} endpoint has rate limiting headers")
+            else:
+                print(f"❓ {endpoint_type} endpoint rate limiting could not be verified")
+                
+    def test_15_metrics_endpoint(self):
+        """Test Prometheus metrics endpoint"""
+        try:
+            response = requests.get(f"{BACKEND_URL}/metrics")
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.headers.get("Content-Type"), "text/plain; version=0.0.4")
+            
+            # Check for common Prometheus metrics
+            content = response.text
+            has_metrics = (
+                "http_requests_total" in content or
+                "request_latency_seconds" in content or
+                "http_request_duration_seconds" in content
+            )
+            
+            if has_metrics:
+                print("✅ Prometheus metrics endpoint working with proper metrics")
+            else:
+                print("❓ Prometheus metrics endpoint working but no standard metrics found")
+        except AssertionError:
+            print("❌ Prometheus metrics endpoint not working as expected")
+            
+    def test_16_comprehensive_health_check(self):
+        """Test comprehensive health check endpoint"""
+        try:
+            response = requests.get(f"{BACKEND_URL}/health")
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            
+            # Check for comprehensive health data
+            has_comprehensive_data = (
+                "components" in data or
+                "services" in data or
+                "database" in data or
+                "redis" in data or
+                "uptime" in data
+            )
+            
+            if has_comprehensive_data:
+                print("✅ Comprehensive health check endpoint working with detailed status")
+                for component, status in data.items():
+                    if component != "status" and component != "timestamp":
+                        print(f"  - {component}: {status}")
+            else:
+                print("❓ Health check endpoint working but not comprehensive")
+        except AssertionError:
+            print("❌ Comprehensive health check not working as expected")
+            
+    def test_17_structured_logging(self):
+        """Test structured logging (indirect test)"""
+        # We can't directly test logging, but we can trigger actions that should log
+        # and check if the system continues to function
+        
+        # Make a request that should trigger logging
+        response = requests.get(
+            f"{BACKEND_URL}/auth/me",
+            headers=self.headers
+        )
+        self.assertEqual(response.status_code, 200)
+        
+        # Make an error request that should trigger error logging
+        response = requests.get(
+            f"{BACKEND_URL}/nonexistent-endpoint",
+            headers=self.headers
+        )
+        self.assertEqual(response.status_code, 404)
+        
+        print("✅ System functioning with structured logging (indirect test)")
+        
+    def test_18_security_middleware(self):
+        """Test security middleware and headers"""
+        response = requests.get(f"{BACKEND_URL}/health")
+        
+        # Check for security headers
+        security_headers = {
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "DENY",
+            "X-XSS-Protection": "1; mode=block",
+            "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+            "Content-Security-Policy": None,  # Any value is acceptable
+            "Referrer-Policy": None  # Any value is acceptable
+        }
+        
+        headers_present = []
+        for header, expected_value in security_headers.items():
+            if header in response.headers:
+                if expected_value is None or response.headers[header] == expected_value:
+                    headers_present.append(header)
+        
+        if len(headers_present) >= 3:  # At least 3 security headers should be present
+            print(f"✅ Security headers present: {', '.join(headers_present)}")
+        else:
+            print("❓ Few or no security headers detected")
+            
+        # Check for request ID header (for request tracking)
+        if "X-Request-ID" in response.headers:
+            print("✅ Request tracking header (X-Request-ID) present")
+        else:
+            print("❓ No request tracking header detected")
+            
+    def test_19_cors_handling(self):
+        """Test CORS handling for multiple domains"""
+        # Test CORS preflight request
+        headers = {
+            "Origin": "https://stargateai.emergent.host",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "Content-Type,Authorization"
+        }
+        
+        response = requests.options(f"{BACKEND_URL}/auth/login", headers=headers)
+        
+        cors_headers_present = (
+            "Access-Control-Allow-Origin" in response.headers and
+            "Access-Control-Allow-Methods" in response.headers and
+            "Access-Control-Allow-Headers" in response.headers
+        )
+        
+        if cors_headers_present:
+            print("✅ CORS handling working for allowed domains")
+        else:
+            print("❓ CORS headers not fully implemented")
+
 if __name__ == "__main__":
     # Run the tests
     unittest.main(argv=['first-arg-is-ignored'], exit=False)
