@@ -41,6 +41,15 @@ from ai_engine import (
     advanced_ai_engine
 )
 
+# Import rate limiting and monitoring components
+from rate_limiter import RateLimiter, RateLimitConfig
+from monitoring import (
+    api_requests_total,
+    api_request_duration,
+    get_rate_limit_key,
+    get_specialized_rate_limit
+)
+
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -55,11 +64,13 @@ REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+structured_logger = structlog.get_logger()
 
 # Initialize clients
 client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
 openai.api_key = OPENAI_API_KEY
+rate_limiter = RateLimiter(redis_url=REDIS_URL)
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
