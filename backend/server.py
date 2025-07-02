@@ -52,6 +52,10 @@ JWT_SECRET = os.environ['JWT_SECRET']
 OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
 REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
 
+# Logging setup
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Initialize clients
 client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
