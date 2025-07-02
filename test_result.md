@@ -490,8 +490,15 @@ test_plan:
     - "Confirm AI integrations with provided API keys"
     - "Test adaptive assessment engine"
     - "Implement advanced AI features (Phase 1)"
+    - "Implement Rate Limiting System"
+    - "Implement Monitoring & Metrics"
+    - "Implement Security Middleware"
   stuck_tasks: 
     - "Frontend testing with Playwright"
+    - "Advanced AI features endpoints"
+    - "Rate Limiting System"
+    - "Monitoring & Metrics"
+    - "Security Middleware"
   test_all: true
   test_priority: "high_first"
 
