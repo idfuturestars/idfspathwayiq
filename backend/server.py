@@ -70,7 +70,157 @@ structured_logger = structlog.get_logger()
 client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
 openai.api_key = OPENAI_API_KEY
-rate_limiter = RateLimiter(redis_url=REDIS_URL)
+
+# ============================================================================
+# PHASE 1: CRITICAL INFRASTRUCTURE - REDIS & MONITORING SETUP
+# ============================================================================
+
+# Redis client for rate limiting and caching
+try:
+    redis_client = redis.asyncio.from_url(REDIS_URL, decode_responses=True)
+    logger.info("Redis connection established for rate limiting")
+except Exception as e:
+    logger.error(f"Redis connection failed: {e}")
+    redis_client = None
+
+# Prometheus metrics for comprehensive monitoring
+api_requests_total = Counter('starguide_api_requests_total', 
+                           'Total API requests', 
+                           ['method', 'endpoint', 'status', 'user_type'])
+api_request_duration = Histogram('starguide_api_request_duration_seconds', 
+                               'API request duration in seconds',
+                               ['endpoint'])
+active_users = Gauge('starguide_active_users_total', 
+                    'Number of active users')
+ai_model_usage = Counter('starguide_ai_model_usage_total', 
+                        'AI model usage counter', 
+                        ['provider', 'model', 'endpoint'])
+rate_limit_hits = Counter('starguide_rate_limit_hits_total',
+                         'Rate limit violations',
+                         ['limit_type', 'endpoint'])
+database_operations = Counter('starguide_database_operations_total',
+                            'Database operations counter',
+                            ['operation_type', 'collection'])
+
+# Structured logging configuration
+structlog.configure(
+    processors=[
+        structlog.stdlib.filter_by_level,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        structlog.processors.JSONRenderer()
+    ],
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    cache_logger_on_first_use=True,
+)
+
+structured_logger = structlog.get_logger()
+
+# ============================================================================
+# PHASE 1: ADVANCED RATE LIMITING SYSTEM
+# ============================================================================
+
+class RateLimitConfig:
+    # Global rate limits (requests per hour)
+    GLOBAL_IP_LIMIT = 1000
+    AUTHENTICATED_USER_LIMIT = 5000
+    AI_ENDPOINT_LIMIT = 100
+    VOICE_PROCESSING_LIMIT = 50
+    ASSESSMENT_LIMIT = 200
+    
+    # Window sizes in seconds
+    HOUR_WINDOW = 3600
+    MINUTE_WINDOW = 60
+
+class RateLimiter:
+    def __init__(self, redis_client):
+        self.redis = redis_client
+        
+    async def check_rate_limit(self, key: str, limit: int, window: int) -> tuple[bool, int, int]:
+        """
+        Check rate limit for a given key
+        Returns: (is_allowed, current_count, reset_time)
+        """
+        if not self.redis:
+            return True, 0, 0
+            
+        try:
+            pipe = self.redis.pipeline()
+            now = int(time.time())
+            current_window = now // window
+            key_with_window = f"{key}:{current_window}"
+            
+            pipe.incr(key_with_window)
+            pipe.expire(key_with_window, window)
+            results = await pipe.execute()
+            
+            current_count = results[0]
+            reset_time = (current_window + 1) * window
+            
+            is_allowed = current_count <= limit
+            
+            if not is_allowed:
+                rate_limit_hits.labels(
+                    limit_type=key.split(':')[0],
+                    endpoint=key.split(':')[-1] if ':' in key else 'unknown'
+                ).inc()
+                
+            return is_allowed, current_count, reset_time
+            
+        except Exception as e:
+            structured_logger.error("Rate limiting error", error=str(e), key=key)
+            return True, 0, 0  # Fail open
+            
+    async def get_rate_limit_info(self, key: str, window: int) -> dict:
+        """Get current rate limit status"""
+        if not self.redis:
+            return {"current": 0, "limit": 0, "reset_time": 0}
+            
+        try:
+            now = int(time.time())
+            current_window = now // window
+            key_with_window = f"{key}:{current_window}"
+            
+            current_count = await self.redis.get(key_with_window) or 0
+            reset_time = (current_window + 1) * window
+            
+            return {
+                "current": int(current_count),
+                "reset_time": reset_time
+            }
+        except Exception as e:
+            structured_logger.error("Rate limit info error", error=str(e), key=key)
+            return {"current": 0, "reset_time": 0}
+
+rate_limiter = RateLimiter(redis_client)
+
+async def get_rate_limit_key(request, user=None):
+    """Generate appropriate rate limit key based on request and user"""
+    client_ip = request.client.host
+    path = request.url.path
+    
+    if user:
+        # Authenticated user - use user ID
+        return f"user:{user.id}:{path}", RateLimitConfig.AUTHENTICATED_USER_LIMIT
+    else:
+        # Anonymous - use IP
+        return f"ip:{client_ip}:{path}", RateLimitConfig.GLOBAL_IP_LIMIT
+
+async def get_specialized_rate_limit(endpoint_path: str, user=None):
+    """Get specialized rate limits for different endpoint types"""
+    if '/ai/' in endpoint_path:
+        return RateLimitConfig.AI_ENDPOINT_LIMIT
+    elif '/voice' in endpoint_path:
+        return RateLimitConfig.VOICE_PROCESSING_LIMIT  
+    elif '/assessment' in endpoint_path or '/adaptive' in endpoint_path:
+        return RateLimitConfig.ASSESSMENT_LIMIT
+    else:
+        return RateLimitConfig.AUTHENTICATED_USER_LIMIT if user else RateLimitConfig.GLOBAL_IP_LIMIT
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
