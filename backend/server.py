@@ -1944,8 +1944,98 @@ async def root():
     return {"message": "StarGuide API powered by IDFS PathwayIQ™", "version": "1.0"}
 
 @api_router.get("/health")
-async def health_check():
-    return {"status": "healthy", "timestamp": datetime.now(timezone.utc)}
+async def comprehensive_health_check():
+    """Advanced health check with all system components"""
+    health_status = {
+        "status": "healthy",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "version": "2.0.0",
+        "services": {}
+    }
+    
+    # Check database
+    try:
+        await db.admin.command('ping')
+        health_status["services"]["database"] = {"status": "healthy", "response_time_ms": 0}
+    except Exception as e:
+        health_status["services"]["database"] = {"status": "unhealthy", "error": str(e)}
+        health_status["status"] = "degraded"
+    
+    # Check Redis
+    try:
+        if redis_client:
+            await redis_client.ping()
+            health_status["services"]["redis"] = {"status": "healthy"}
+        else:
+            health_status["services"]["redis"] = {"status": "unavailable"}
+    except Exception as e:
+        health_status["services"]["redis"] = {"status": "unhealthy", "error": str(e)}
+        health_status["status"] = "degraded"
+    
+    # Check AI providers (basic connectivity)
+    ai_health = {}
+    for provider in ["openai", "claude", "gemini"]:
+        try:
+            # Just check if API keys are configured
+            key_name = f"{provider.upper()}_API_KEY"
+            if os.environ.get(key_name) and os.environ.get(key_name) != "your_" + provider.lower() + "_api_key_here":
+                ai_health[provider] = {"status": "configured"}
+            else:
+                ai_health[provider] = {"status": "not_configured"}
+        except Exception as e:
+            ai_health[provider] = {"status": "error", "error": str(e)}
+    
+    health_status["services"]["ai_providers"] = ai_health
+    
+    return health_status
+
+@api_router.get("/metrics")
+async def prometheus_metrics():
+    """Prometheus metrics endpoint"""
+    return Response(
+        generate_latest(prometheus_client.REGISTRY),
+        media_type=CONTENT_TYPE_LATEST
+    )
+
+@api_router.get("/system/stats")
+async def system_statistics(current_user: dict = Depends(get_current_user)):
+    """System statistics for administrators"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Get database statistics
+        db_stats = await db.command("dbStats")
+        
+        # Get active user count (last 24 hours)
+        yesterday = datetime.now(timezone.utc) - timedelta(days=1)
+        active_users_count = await db.user_sessions.count_documents({
+            "last_activity": {"$gte": yesterday}
+        })
+        
+        # Get rate limiting statistics
+        rate_limit_stats = {}
+        if redis_client:
+            # This would require Redis to track statistics
+            rate_limit_stats = {"message": "Rate limiting active"}
+        
+        return {
+            "database": {
+                "size_bytes": db_stats.get("dataSize", 0),
+                "collections": db_stats.get("collections", 0),
+                "indexes": db_stats.get("indexes", 0)
+            },
+            "users": {
+                "active_24h": active_users_count,
+                "total": await db.users.count_documents({})
+            },
+            "rate_limiting": rate_limit_stats,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        structured_logger.error("System statistics error", error=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve system statistics")
 
 # Include router in main app - MOVED TO END OF FILE
 # app.include_router(api_router)
