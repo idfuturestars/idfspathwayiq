@@ -41,15 +41,6 @@ from ai_engine import (
     advanced_ai_engine
 )
 
-# Import rate limiting and monitoring components
-from rate_limiter import RateLimiter, RateLimitConfig
-from monitoring import (
-    api_requests_total,
-    api_request_duration,
-    get_rate_limit_key,
-    get_specialized_rate_limit
-)
-
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
