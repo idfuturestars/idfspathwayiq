@@ -98,6 +98,132 @@ app.add_middleware(
     expose_headers=["*"]
 )
 
+# ============================================================================
+# PHASE 1: MIDDLEWARE FOR MONITORING & RATE LIMITING
+# ============================================================================
+
+@app.middleware("http")
+async def monitoring_and_rate_limiting_middleware(request: Request, call_next):
+    """Comprehensive middleware for monitoring, logging, and rate limiting"""
+    start_time = time.time()
+    client_ip = request.client.host
+    method = request.method
+    path = request.url.path
+    
+    # Skip rate limiting for health checks and metrics
+    if path in ["/api/health", "/api/metrics", "/favicon.ico"]:
+        response = await call_next(request)
+        return response
+    
+    # Get user from token if available
+    user = None
+    try:
+        if "authorization" in request.headers:
+            token = request.headers["authorization"].replace("Bearer ", "")
+            payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+            user_doc = await db.users.find_one({"id": payload["sub"]})
+            if user_doc:
+                user = type('User', (), user_doc)()
+    except:
+        pass  # Continue without user authentication for rate limiting
+    
+    # Generate rate limit key and get appropriate limit
+    rate_key, base_limit = await get_rate_limit_key(request, user)
+    specialized_limit = await get_specialized_rate_limit(path, user)
+    effective_limit = min(base_limit, specialized_limit)
+    
+    # Check rate limit
+    is_allowed, current_count, reset_time = await rate_limiter.check_rate_limit(
+        rate_key, effective_limit, RateLimitConfig.HOUR_WINDOW
+    )
+    
+    if not is_allowed:
+        structured_logger.warning(
+            "Rate limit exceeded",
+            client_ip=client_ip,
+            user_id=user.id if user else None,
+            path=path,
+            current_count=current_count,
+            limit=effective_limit
+        )
+        return JSONResponse(
+            status_code=429,
+            content={
+                "error": "Rate limit exceeded",
+                "current": current_count,
+                "limit": effective_limit,
+                "reset_time": reset_time
+            },
+            headers={
+                "X-RateLimit-Limit": str(effective_limit),
+                "X-RateLimit-Current": str(current_count),
+                "X-RateLimit-Reset": str(reset_time),
+                "Retry-After": str(reset_time - int(time.time()))
+            }
+        )
+    
+    # Process request
+    try:
+        response = await call_next(request)
+        status_code = response.status_code
+        
+        # Add rate limit headers to successful responses
+        response.headers["X-RateLimit-Limit"] = str(effective_limit)
+        response.headers["X-RateLimit-Current"] = str(current_count)
+        response.headers["X-RateLimit-Reset"] = str(reset_time)
+        
+        # Add security headers
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https: wss:;"
+        
+        # Add request tracking header
+        response.headers["X-Request-ID"] = str(uuid.uuid4())
+        
+    except Exception as e:
+        structured_logger.error(
+            "Request processing error",
+            client_ip=client_ip,
+            user_id=user.id if user else None,
+            path=path,
+            error=str(e)
+        )
+        status_code = 500
+        response = JSONResponse(
+            status_code=500,
+            content={"error": "Internal server error"}
+        )
+    
+    # Record metrics
+    duration = time.time() - start_time
+    user_type = "authenticated" if user else "anonymous"
+    
+    api_requests_total.labels(
+        method=method,
+        endpoint=path,
+        status=str(status_code),
+        user_type=user_type
+    ).inc()
+    
+    api_request_duration.labels(endpoint=path).observe(duration)
+    
+    # Structured logging
+    structured_logger.info(
+        "API request completed",
+        method=method,
+        path=path,
+        status_code=status_code,
+        duration=duration,
+        client_ip=client_ip,
+        user_id=user.id if user else None,
+        user_type=user_type
+    )
+    
+    return response
+
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
