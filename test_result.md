@@ -351,8 +351,8 @@ backend:
         comment: "Rate limiting system is now implemented and working correctly. Rate limit headers (X-RateLimit-Limit, X-RateLimit-Current, X-RateLimit-Reset) are present in API responses. The system is configured with different rate limits for different endpoint types as specified in the RateLimitConfig class."
         
   - task: "Monitoring & Metrics"
-    implemented: false
-    working: false
+    implemented: true
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
@@ -361,6 +361,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "Prometheus metrics endpoint (/api/metrics) is not implemented. The endpoint returns a 404 Not Found error. The health check endpoint exists but only returns basic status information, not comprehensive system component status."
+      - working: true
+        agent: "testing"
+        comment: "Monitoring and metrics system is now implemented and working correctly. The /api/metrics endpoint returns Prometheus-compatible metrics data with various counters, histograms, and gauges. The /api/health endpoint provides comprehensive system status including database, Redis, and AI provider configurations."
         
   - task: "Structured Logging"
     implemented: true
