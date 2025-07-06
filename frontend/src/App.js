@@ -8,14 +8,14 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import SkillScan from './pages/SkillScan';
 import AdaptiveSkillScan from './pages/AdaptiveSkillScan';
-import StarMentor from './pages/StarMentor';
-import GalaxyQuests from './pages/GalaxyQuests';
-import LearningPods from './pages/LearningPods';
+import PathwayGuide from './pages/PathwayGuide';
+import LearningJourneys from './pages/LearningJourneys';
+import LearningCircles from './pages/LearningCircles';
 import Trajectory from './pages/Trajectory';
-import StarRankings from './pages/StarRankings';
-import StarBadges from './pages/StarBadges';
-import SOSStation from './pages/SOSStation';
-import MissionIntel from './pages/MissionIntel';
+import MilestoneTracker from './pages/MilestoneTracker';
+import PathwayAchievements from './pages/PathwayAchievements';
+import NavigatorHub from './pages/NavigatorHub';
+import CareerInsights from './pages/CareerInsights';
 import LoadingScreen from './components/LoadingScreen';
 import './App.css';
 
@@ -90,7 +90,7 @@ function AppContent() {
             } 
           />
           <Route 
-            path="/adaptive-skillscan" 
+            path="/talent-compass" 
             element={
               <ProtectedRoute>
                 <AdaptiveSkillScan />
@@ -98,26 +98,26 @@ function AppContent() {
             } 
           />
           <Route 
-            path="/starmentor" 
+            path="/pathway-guide" 
             element={
               <ProtectedRoute>
-                <StarMentor />
+                <PathwayGuide />
               </ProtectedRoute>
             } 
           />
           <Route 
-            path="/galaxy-quests" 
+            path="/learning-journeys" 
             element={
               <ProtectedRoute>
-                <GalaxyQuests />
+                <LearningJourneys />
               </ProtectedRoute>
             } 
           />
           <Route 
-            path="/learning-pods" 
+            path="/learning-circles" 
             element={
               <ProtectedRoute>
-                <LearningPods />
+                <LearningCircles />
               </ProtectedRoute>
             } 
           />
@@ -130,37 +130,47 @@ function AppContent() {
             } 
           />
           <Route 
-            path="/starrankings" 
+            path="/milestone-tracker" 
             element={
               <ProtectedRoute>
-                <StarRankings />
+                <MilestoneTracker />
               </ProtectedRoute>
             } 
           />
           <Route 
-            path="/starbadges" 
+            path="/pathway-achievements" 
             element={
               <ProtectedRoute>
-                <StarBadges />
+                <PathwayAchievements />
               </ProtectedRoute>
             } 
           />
           <Route 
-            path="/sos-station" 
+            path="/navigator-hub" 
             element={
               <ProtectedRoute>
-                <SOSStation />
+                <NavigatorHub />
               </ProtectedRoute>
             } 
           />
           <Route 
-            path="/mission-intel" 
+            path="/career-insights" 
             element={
               <ProtectedRoute>
-                <MissionIntel />
+                <CareerInsights />
               </ProtectedRoute>
             } 
           />
+          
+          {/* Legacy route redirects for backward compatibility */}
+          <Route path="/adaptive-skillscan" element={<Navigate to="/talent-compass" replace />} />
+          <Route path="/starmentor" element={<Navigate to="/pathway-guide" replace />} />
+          <Route path="/galaxy-quests" element={<Navigate to="/learning-journeys" replace />} />
+          <Route path="/learning-pods" element={<Navigate to="/learning-circles" replace />} />
+          <Route path="/starrankings" element={<Navigate to="/milestone-tracker" replace />} />
+          <Route path="/starbadges" element={<Navigate to="/pathway-achievements" replace />} />
+          <Route path="/sos-station" element={<Navigate to="/navigator-hub" replace />} />
+          <Route path="/mission-intel" element={<Navigate to="/career-insights" replace />} />
           
           {/* Default redirect */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -168,24 +178,25 @@ function AppContent() {
         </Routes>
       </Router>
       
-      {/* Toast notifications */}
+      {/* Toast notifications with dark minimalist theme */}
       <Toaster
         position="top-right"
         toastOptions={{
           duration: 4000,
           style: {
-            background: '#1a1a1a',
-            color: '#ffffff',
-            border: '1px solid #333',
+            background: '#111827',
+            color: '#f9fafb',
+            border: '1px solid #374151',
+            borderRadius: '8px',
           },
           success: {
             style: {
-              border: '1px solid #4CAF50',
+              border: '1px solid #6b7280',
             },
           },
           error: {
             style: {
-              border: '1px solid #ff4444',
+              border: '1px solid #ef4444',
             },
           },
         }}
