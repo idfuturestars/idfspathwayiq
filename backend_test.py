@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 StarGuide Educational Platform - Backend API Test Suite
-This script tests all major backend API endpoints and features.
+This script tests all major backend API endpoints and features with focus on Phase 1 strategic enhancements.
 """
 
 import requests
@@ -12,6 +12,7 @@ import string
 import unittest
 import os
 from datetime import datetime
+import sys
 
 # Get the backend URL from the frontend .env file
 BACKEND_URL = "https://76b382ff-b491-4ce5-91e0-b22087b7f6c7.preview.emergentagent.com/api"
