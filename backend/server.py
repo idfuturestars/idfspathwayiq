@@ -1946,7 +1946,7 @@ async def comprehensive_health_check():
     
     # Check database
     try:
-        await db.admin.command('ping')
+        await db.command('ping')
         health_status["services"]["database"] = {"status": "healthy", "response_time_ms": 0}
     except Exception as e:
         health_status["services"]["database"] = {"status": "unhealthy", "error": str(e)}
