@@ -3,13 +3,13 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import StarLogo from './StarLogo';
 import { 
-  RocketLaunchIcon,
+  HomeIcon,
   UserGroupIcon,
   BookOpenIcon,
   TrophyIcon,
   ChartBarIcon,
   StarIcon,
-  ExclamationTriangleIcon,
+  QuestionMarkCircleIcon,
   MapIcon,
   ChatBubbleLeftRightIcon,
   InformationCircleIcon,
@@ -17,8 +17,9 @@ import {
   XMarkIcon,
   MagnifyingGlassIcon,
   BellIcon,
-  UserCircleIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  AcademicCapIcon,
+  BriefcaseIcon
 } from '@heroicons/react/24/outline';
 
 const Layout = ({ children }) => {
@@ -29,16 +30,16 @@ const Layout = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const navigationItems = [
-    { name: 'Mission Control', icon: RocketLaunchIcon, path: '/dashboard', color: '#ff6b6b' },
-    { name: 'SkillScan™', icon: BookOpenIcon, path: '/skillscan', color: '#4ecdc4' },
-    { name: 'StarMentor™', icon: ChatBubbleLeftRightIcon, path: '/starmentor', color: '#45b7d1' },
-    { name: 'Galaxy Quests', icon: MapIcon, path: '/galaxy-quests', color: '#96ceb4' },
-    { name: 'Learning Pods', icon: UserGroupIcon, path: '/learning-pods', color: '#ffd93d' },
-    { name: 'Trajectory', icon: ChartBarIcon, path: '/trajectory', color: '#ff9ff3' },
-    { name: 'StarRankings', icon: TrophyIcon, path: '/starrankings', color: '#f9ca24' },
-    { name: 'StarBadges™', icon: StarIcon, path: '/starbadges', color: '#6c5ce7' },
-    { name: 'SOS Station', icon: ExclamationTriangleIcon, path: '/sos-station', color: '#fd79a8' },
-    { name: 'Mission Intel', icon: InformationCircleIcon, path: '/mission-intel', color: '#00b894' },
+    { name: 'Dashboard', icon: HomeIcon, path: '/dashboard', color: '#6b7280' },
+    { name: 'Talent Compass', icon: AcademicCapIcon, path: '/talent-compass', color: '#6b7280' },
+    { name: 'Pathway Guide', icon: ChatBubbleLeftRightIcon, path: '/pathway-guide', color: '#6b7280' },
+    { name: 'Learning Journeys', icon: MapIcon, path: '/learning-journeys', color: '#6b7280' },
+    { name: 'Learning Circles', icon: UserGroupIcon, path: '/learning-circles', color: '#6b7280' },
+    { name: 'Progress Tracker', icon: ChartBarIcon, path: '/trajectory', color: '#6b7280' },
+    { name: 'Milestone Tracker', icon: TrophyIcon, path: '/milestone-tracker', color: '#6b7280' },
+    { name: 'Achievements', icon: StarIcon, path: '/pathway-achievements', color: '#6b7280' },
+    { name: 'Navigator Hub', icon: QuestionMarkCircleIcon, path: '/navigator-hub', color: '#6b7280' },
+    { name: 'Career Insights', icon: BriefcaseIcon, path: '/career-insights', color: '#6b7280' },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -62,8 +63,8 @@ const Layout = ({ children }) => {
           
           <StarLogo size={40} className="mr-3" />
           <div>
-            <h1 className="text-xl font-bold text-white">StarGuide</h1>
-            <p className="text-xs text-gray-400">powered by IDFS PathwayIQ™</p>
+            <h1 className="text-xl font-bold text-white">PathwayIQ</h1>
+            <p className="text-xs text-gray-400">by IDFS Navigator™</p>
           </div>
         </div>
 
@@ -72,10 +73,10 @@ const Layout = ({ children }) => {
             <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Search lessons, quests, or mentors..."
+              placeholder="Search pathways, insights, or resources..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
+              className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
             />
           </div>
         </div>
@@ -88,7 +89,7 @@ const Layout = ({ children }) => {
           <div className="flex items-center space-x-3">
             <div className="text-right hidden sm:block">
               <p className="text-sm font-medium text-white">{user?.username}</p>
-              <p className="text-xs text-gray-400">Level {user?.level} • {user?.xp} XP</p>
+              <p className="text-xs text-gray-400">Level {user?.level} • {user?.xp} Points</p>
             </div>
             <button
               onClick={handleLogout}
@@ -114,7 +115,7 @@ const Layout = ({ children }) => {
             >
               <item.icon 
                 className="nav-item-icon" 
-                style={{ color: isActive(item.path) ? item.color : '#888' }}
+                style={{ color: isActive(item.path) ? '#ffffff' : '#6b7280' }}
               />
               <span>{item.name}</span>
             </button>
@@ -130,18 +131,18 @@ const Layout = ({ children }) => {
       {/* Right Sidebar */}
       <aside className="starguide-right-sidebar hidden lg:block">
         <div className="p-6">
-          {/* User Stats */}
+          {/* User Progress */}
           <div className="starguide-card mb-6">
             <h3 className="text-lg font-semibold mb-4 text-white">Your Progress</h3>
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-400">Level Progress</span>
-                  <span className="text-white">{user?.xp % 100}/100 XP</span>
+                  <span className="text-white">{user?.xp % 100}/100 Points</span>
                 </div>
                 <div className="progress-bar">
                   <div 
-                    className="progress-fill" 
+                    className="bg-gray-600 h-2 rounded-full transition-all duration-300" 
                     style={{ width: `${(user?.xp % 100)}%` }}
                   ></div>
                 </div>
@@ -153,8 +154,8 @@ const Layout = ({ children }) => {
                   <p className="text-xs text-gray-400">Level</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-green-500">{user?.xp}</p>
-                  <p className="text-xs text-gray-400">Total XP</p>
+                  <p className="text-2xl font-bold text-gray-400">{user?.xp}</p>
+                  <p className="text-xs text-gray-400">Total Points</p>
                 </div>
               </div>
             </div>
@@ -165,21 +166,21 @@ const Layout = ({ children }) => {
             <h3 className="text-lg font-semibold mb-4 text-white">Quick Actions</h3>
             <div className="space-y-2">
               <button 
-                onClick={() => navigate('/galaxy-quests')}
+                onClick={() => navigate('/learning-journeys')}
                 className="w-full text-left p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
               >
                 <div className="flex items-center">
-                  <MapIcon className="w-5 h-5 mr-3 text-green-500" />
-                  <span className="text-white">Find Battle</span>
+                  <MapIcon className="w-5 h-5 mr-3 text-gray-400" />
+                  <span className="text-white">Explore Pathways</span>
                 </div>
               </button>
               <button 
-                onClick={() => navigate('/learning-pods')}
+                onClick={() => navigate('/learning-circles')}
                 className="w-full text-left p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
               >
                 <div className="flex items-center">
-                  <UserGroupIcon className="w-5 h-5 mr-3 text-blue-500" />
-                  <span className="text-white">Create Private Quest</span>
+                  <UserGroupIcon className="w-5 h-5 mr-3 text-gray-400" />
+                  <span className="text-white">Join Learning Circle</span>
                 </div>
               </button>
             </div>
@@ -190,16 +191,16 @@ const Layout = ({ children }) => {
             <h3 className="text-lg font-semibold mb-4 text-white">Recent Activity</h3>
             <div className="space-y-3">
               <div className="flex items-center text-sm">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                <span className="text-gray-300">Completed JavaScript Quest</span>
+                <div className="w-2 h-2 bg-gray-400 rounded-full mr-3"></div>
+                <span className="text-gray-300">Completed Web Development module</span>
               </div>
               <div className="flex items-center text-sm">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                <span className="text-gray-300">Joined Python Learning Pod</span>
+                <div className="w-2 h-2 bg-gray-500 rounded-full mr-3"></div>
+                <span className="text-gray-300">Joined Python Learning Circle</span>
               </div>
               <div className="flex items-center text-sm">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full mr-3"></div>
-                <span className="text-gray-300">Earned Badge: Code Warrior</span>
+                <div className="w-2 h-2 bg-gray-600 rounded-full mr-3"></div>
+                <span className="text-gray-300">Earned Pathway Explorer achievement</span>
               </div>
             </div>
           </div>
