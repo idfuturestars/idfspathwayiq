@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   DocumentTextIcon,
@@ -15,11 +16,13 @@ import {
   ExclamationTriangleIcon,
   StarIcon,
   ChartBarIcon,
-  AcademicCapIcon
+  AcademicCapIcon,
+  CompassIcon
 } from '@heroicons/react/24/outline';
 
 const AdaptiveSkillScan = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   
   // Session state
   const [sessionId, setSessionId] = useState(null);
@@ -36,7 +39,7 @@ const AdaptiveSkillScan = () => {
   const [assessmentConfig, setAssessmentConfig] = useState({
     subject: '',
     target_grade_level: '',
-    assessment_type: 'diagnostic',
+    assessment_type: 'talent_discovery',
     enable_think_aloud: true,
     enable_ai_help_tracking: true,
     max_questions: 20
@@ -94,9 +97,9 @@ const AdaptiveSkillScan = () => {
   ];
   
   const assessmentTypes = [
-    { value: 'diagnostic', label: 'Diagnostic Assessment', description: 'Discover your current skill level' },
-    { value: 'practice', label: 'Practice Mode', description: 'Practice with adaptive questions' },
-    { value: 'challenge', label: 'Challenge Mode', description: 'Push your limits with harder questions' }
+    { value: 'talent_discovery', label: 'Talent Discovery', description: 'Identify your natural strengths and abilities' },
+    { value: 'pathway_placement', label: 'Pathway Placement', description: 'Find the best learning pathway for your goals' },
+    { value: 'career_readiness', label: 'Career Readiness', description: 'Assess your readiness for specific career paths' }
   ];
 
   // Timer effect
@@ -240,17 +243,17 @@ const AdaptiveSkillScan = () => {
 
   const getGradeLevelColor = (gradeLevel) => {
     if (gradeLevel.includes('kindergarten') || gradeLevel.includes('grade_1') || gradeLevel.includes('grade_2')) {
-      return 'text-green-400';
+      return 'text-gray-400';
     } else if (gradeLevel.includes('grade_') && parseInt(gradeLevel.split('_')[1]) <= 5) {
-      return 'text-blue-400';
+      return 'text-gray-500';
     } else if (gradeLevel.includes('grade_') && parseInt(gradeLevel.split('_')[1]) <= 8) {
-      return 'text-yellow-400';
+      return 'text-gray-400';
     } else if (gradeLevel.includes('grade_') && parseInt(gradeLevel.split('_')[1]) <= 12) {
-      return 'text-orange-400';
+      return 'text-gray-300';
     } else if (gradeLevel.includes('undergraduate')) {
-      return 'text-purple-400';
+      return 'text-gray-200';
     } else {
-      return 'text-red-400';
+      return 'text-white';
     }
   };
 
@@ -259,9 +262,12 @@ const AdaptiveSkillScan = () => {
     return (
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-4">Adaptive SkillScan™</h1>
+          <h1 className="text-3xl font-bold text-white mb-4 flex items-center justify-center">
+            <CompassIcon className="w-8 h-8 text-gray-400 mr-3" />
+            Talent Compass™
+          </h1>
           <p className="text-gray-400 text-lg">
-            Personalized assessment that adapts to your skill level (K-PhD+)
+            Discover your talents and find your optimal learning pathway (K-PhD+)
           </p>
         </div>
 
@@ -284,7 +290,7 @@ const AdaptiveSkillScan = () => {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Target Grade Level (Optional)</label>
+              <label className="form-label">Target Level (Optional)</label>
               <select
                 value={assessmentConfig.target_grade_level}
                 onChange={(e) => setAssessmentConfig({...assessmentConfig, target_grade_level: e.target.value})}
@@ -306,7 +312,7 @@ const AdaptiveSkillScan = () => {
                   key={type.value}
                   className={`relative flex flex-col p-4 border rounded-lg cursor-pointer transition-all ${
                     assessmentConfig.assessment_type === type.value
-                      ? 'border-green-500 bg-green-500/10'
+                      ? 'border-gray-500 bg-gray-800'
                       : 'border-gray-600 hover:border-gray-500'
                   }`}
                 >
@@ -335,7 +341,7 @@ const AdaptiveSkillScan = () => {
                 className="mr-3"
               />
               <label htmlFor="think_aloud" className="text-gray-300">
-                Enable Think-Aloud Mode (explain your reasoning)
+                Enable reflection mode (explain your reasoning)
               </label>
             </div>
             
@@ -354,22 +360,22 @@ const AdaptiveSkillScan = () => {
           </div>
 
           <div className="bg-gray-800 rounded-lg p-6 mb-6">
-            <h3 className="text-lg font-semibold text-white mb-4">How Adaptive SkillScan™ Works</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">How Talent Compass™ Works</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
               <div>
-                <ChartBarIcon className="w-8 h-8 text-blue-500 mx-auto mb-2" />
+                <ChartBarIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                 <p className="text-white font-medium">Adaptive Questions</p>
-                <p className="text-gray-400 text-sm">Questions adjust to your skill level</p>
+                <p className="text-gray-400 text-sm">Questions adjust to your ability level</p>
               </div>
               <div>
-                <MicrophoneIcon className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                <p className="text-white font-medium">Think-Aloud Analysis</p>
-                <p className="text-gray-400 text-sm">AI analyzes your reasoning process</p>
+                <MicrophoneIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-white font-medium">Reflection Analysis</p>
+                <p className="text-gray-400 text-sm">AI analyzes your thinking process</p>
               </div>
               <div>
-                <AcademicCapIcon className="w-8 h-8 text-purple-500 mx-auto mb-2" />
-                <p className="text-white font-medium">Grade Level Detection</p>
-                <p className="text-gray-400 text-sm">Accurate K-PhD+ level assessment</p>
+                <AcademicCapIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-white font-medium">Pathway Matching</p>
+                <p className="text-gray-400 text-sm">Find your optimal learning path</p>
               </div>
             </div>
           </div>
@@ -385,7 +391,7 @@ const AdaptiveSkillScan = () => {
               ) : (
                 <>
                   <PlayIcon className="w-5 h-5 mr-2" />
-                  Start Adaptive Assessment
+                  Start Talent Discovery
                 </>
               )}
             </button>
@@ -401,12 +407,12 @@ const AdaptiveSkillScan = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-4">Assessment Complete!</h1>
-          <p className="text-gray-400 text-lg">Your adaptive learning profile has been generated</p>
+          <p className="text-gray-400 text-lg">Your personalized learning profile has been generated</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="starguide-card text-center">
-            <StarIcon className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
+            <StarIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-white mb-2">
               {Math.round(sessionAnalytics.accuracy * 100)}%
             </h3>
@@ -414,7 +420,7 @@ const AdaptiveSkillScan = () => {
           </div>
           
           <div className="starguide-card text-center">
-            <AcademicCapIcon className="w-12 h-12 text-blue-500 mx-auto mb-4" />
+            <AcademicCapIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-white mb-2">
               {sessionAnalytics.estimated_grade_level?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
             </h3>
@@ -422,7 +428,7 @@ const AdaptiveSkillScan = () => {
           </div>
           
           <div className="starguide-card text-center">
-            <ClockIcon className="w-12 h-12 text-green-500 mx-auto mb-4" />
+            <ClockIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-white mb-2">
               {Math.round(sessionAnalytics.session_duration / 60)}min
             </h3>
@@ -432,14 +438,14 @@ const AdaptiveSkillScan = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="starguide-card">
-            <h3 className="text-xl font-semibold text-white mb-4">Learning Progress</h3>
+            <h3 className="text-xl font-semibold text-white mb-4">Ability Progress</h3>
             <div className="h-64 flex items-end space-x-2 mb-4">
               {abilityProgress.map((point, index) => (
                 <div key={index} className="flex-1 flex flex-col items-center">
                   <div
                     className={`w-full rounded-t transition-all duration-500 ${
-                      point.is_correct === true ? 'bg-green-500' : 
-                      point.is_correct === false ? 'bg-red-500' : 'bg-blue-500'
+                      point.is_correct === true ? 'bg-gray-500' : 
+                      point.is_correct === false ? 'bg-gray-700' : 'bg-gray-600'
                     }`}
                     style={{
                       height: `${point.ability_estimate * 200}px`
@@ -468,7 +474,7 @@ const AdaptiveSkillScan = () => {
                 <span className="text-white">{Math.round(sessionAnalytics.ai_help_percentage)}%</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Think-Aloud Quality</span>
+                <span className="text-gray-400">Reflection Quality</span>
                 <span className="text-white">{Math.round(sessionAnalytics.think_aloud_quality * 100)}%</span>
               </div>
               <div className="flex justify-between">
@@ -510,7 +516,10 @@ const AdaptiveSkillScan = () => {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Adaptive SkillScan™</h1>
+          <h1 className="text-2xl font-bold text-white flex items-center">
+            <CompassIcon className="w-6 h-6 text-gray-400 mr-2" />
+            Talent Compass™
+          </h1>
           <p className="text-gray-400">Question {questionNumber} • {assessmentConfig.subject}</p>
         </div>
         
@@ -538,7 +547,7 @@ const AdaptiveSkillScan = () => {
         </div>
         <div className="starguide-card text-center">
           <p className="text-gray-400 text-sm">Difficulty</p>
-          <p className="text-lg font-semibold text-yellow-500">
+          <p className="text-lg font-semibold text-gray-400">
             {Math.round((currentQuestion?.estimated_difficulty || 0) * 100)}%
           </p>
         </div>
@@ -550,12 +559,12 @@ const AdaptiveSkillScan = () => {
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-4">
-                <span className="badge badge-info">{currentQuestion.complexity}</span>
-                <span className="badge badge-warning">
+                <span className="badge bg-gray-600 text-white">{currentQuestion.complexity}</span>
+                <span className="badge bg-gray-700 text-gray-300">
                   {currentQuestion.estimated_time_seconds}s estimated
                 </span>
                 {aiHelpUsed && (
-                  <span className="badge bg-purple-500 text-white">AI Help Used</span>
+                  <span className="badge bg-gray-800 text-white">AI Help Used</span>
                 )}
               </div>
             </div>
@@ -574,8 +583,8 @@ const AdaptiveSkillScan = () => {
                   onClick={() => setSelectedAnswer(option)}
                   className={`w-full text-left p-4 rounded-lg border transition-all ${
                     selectedAnswer === option
-                      ? 'border-green-500 bg-green-500/10'
-                      : 'border-gray-600 hover:border-gray-500 bg-gray-800'
+                      ? 'border-gray-500 bg-gray-800'
+                      : 'border-gray-600 hover:border-gray-500 bg-gray-900'
                   }`}
                 >
                   <span className="text-white">{option}</span>
@@ -598,13 +607,13 @@ const AdaptiveSkillScan = () => {
           {assessmentConfig.enable_think_aloud && (
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">Think Aloud Mode</h3>
+                <h3 className="text-lg font-semibold text-white">Reflection Mode</h3>
                 <button
                   onClick={() => setThinkAloudMode(!thinkAloudMode)}
-                  className={`btn-secondary text-sm ${thinkAloudMode ? 'bg-green-500/20 border-green-500' : ''}`}
+                  className={`btn-secondary text-sm ${thinkAloudMode ? 'bg-gray-700 border-gray-600' : ''}`}
                 >
                   <MicrophoneIcon className="w-4 h-4 mr-2" />
-                  {thinkAloudMode ? 'Recording' : 'Start Recording'}
+                  {thinkAloudMode ? 'Recording' : 'Start Reflecting'}
                 </button>
               </div>
               
@@ -683,8 +692,8 @@ const AdaptiveSkillScan = () => {
               </div>
               
               {aiHelpUsed && (
-                <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
-                  <p className="text-purple-300 text-sm">
+                <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+                  <p className="text-gray-400 text-sm">
                     <ExclamationTriangleIcon className="w-4 h-4 inline mr-1" />
                     AI assistance used - this will affect your score and ability estimate
                   </p>
