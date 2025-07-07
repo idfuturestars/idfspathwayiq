@@ -17,7 +17,7 @@ import {
   StarIcon,
   ChartBarIcon,
   AcademicCapIcon,
-  CompassIcon
+  MapIcon
 } from '@heroicons/react/24/outline';
 
 const AdaptiveSkillScan = () => {
