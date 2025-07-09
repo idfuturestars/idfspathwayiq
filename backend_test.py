@@ -501,6 +501,10 @@ class StarGuideBackendTest(unittest.TestCase):
         
     def test_13_enhanced_ai_features(self):
         """Test enhanced AI features (Phase 1)"""
+        # Make sure we're authenticated
+        if not self.auth_token:
+            self.test_04_user_login()
+            
         # Test enhanced AI chat
         try:
             chat_data = {
