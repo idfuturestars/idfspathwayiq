@@ -567,12 +567,25 @@ const AdaptiveSkillScan = () => {
         <div className="text-center mt-8">
           <button
             onClick={() => {
+              // Clear session storage and reset all states
+              clearSessionStorage();
               setSessionStarted(false);
               setSessionComplete(false);
               setSessionId(null);
               setCurrentQuestion(null);
               setSessionAnalytics(null);
               setAbilityProgress([]);
+              setQuestionNumber(0);
+              setSelectedAnswer('');
+              setThinkAloudData({
+                reasoning: '',
+                strategy: '',
+                confidence_level: 3,
+                difficulty_perception: 3,
+                connections_to_prior_knowledge: ''
+              });
+              setAiHelpUsed(false);
+              setAiHelpDetails(null);
             }}
             className="btn-primary mr-4"
           >
