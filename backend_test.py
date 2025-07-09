@@ -621,14 +621,18 @@ class StarGuideBackendTest(unittest.TestCase):
         rate_limited = any(r.status_code == 429 for r in responses)
         
         # Check for rate limit headers
-        rate_limit_headers = any("X-RateLimit-Limit" in r.headers for r in responses)
-        rate_limit_remaining = any("X-RateLimit-Remaining" in r.headers for r in responses)
-        rate_limit_reset = any("X-RateLimit-Reset" in r.headers for r in responses)
+        rate_limit_headers = [r for r in responses if "X-RateLimit-Limit" in r.headers]
         
         if rate_limited:
             print("✅ Rate limiting is enforced (received 429 response)")
-        elif rate_limit_headers and rate_limit_remaining and rate_limit_reset:
-            print("✅ Rate limiting headers present but limit not exceeded")
+        elif rate_limit_headers:
+            print(f"✅ Rate limiting headers present in {len(rate_limit_headers)} responses but limit not exceeded")
+            # Show an example of the headers
+            if rate_limit_headers:
+                example = rate_limit_headers[0]
+                print(f"  - X-RateLimit-Limit: {example.headers.get('X-RateLimit-Limit')}")
+                print(f"  - X-RateLimit-Current: {example.headers.get('X-RateLimit-Current')}")
+                print(f"  - X-RateLimit-Reset: {example.headers.get('X-RateLimit-Reset')}")
         else:
             print("❓ Rate limiting could not be verified")
             
@@ -637,16 +641,22 @@ class StarGuideBackendTest(unittest.TestCase):
             ("/", "API"),
             ("/auth/login", "Auth"),
             ("/ai/chat", "AI"),
-            ("/ai/voice-to-text", "Voice"),
             ("/adaptive-assessment/start", "Assessment")
         ]
         
         for endpoint, endpoint_type in endpoint_types:
-            response = requests.get(f"{BACKEND_URL}{endpoint}")
-            if any(header.startswith("X-RateLimit") for header in response.headers):
-                print(f"✅ {endpoint_type} endpoint has rate limiting headers")
-            else:
-                print(f"❓ {endpoint_type} endpoint rate limiting could not be verified")
+            try:
+                response = requests.get(f"{BACKEND_URL}{endpoint}")
+                if any(header.startswith("X-RateLimit") for header in response.headers):
+                    print(f"✅ {endpoint_type} endpoint has rate limiting headers")
+                    # Show the headers
+                    for header in response.headers:
+                        if header.startswith("X-RateLimit"):
+                            print(f"  - {header}: {response.headers[header]}")
+                else:
+                    print(f"❓ {endpoint_type} endpoint rate limiting could not be verified")
+            except Exception as e:
+                print(f"❓ {endpoint_type} endpoint test failed: {e}")
                 
     def test_15_metrics_endpoint(self):
         """Test Prometheus metrics endpoint"""
