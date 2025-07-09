@@ -794,5 +794,27 @@ class StarGuideBackendTest(unittest.TestCase):
             print("❓ CORS headers not fully implemented")
 
 if __name__ == "__main__":
-    # Run the tests
-    unittest.main(argv=['first-arg-is-ignored'], exit=False)
+    # Run the tests in a specific order
+    test_suite = unittest.TestSuite()
+    test_suite.addTest(StarGuideBackendTest('test_01_health_check'))
+    test_suite.addTest(StarGuideBackendTest('test_02_root_endpoint'))
+    test_suite.addTest(StarGuideBackendTest('test_03_user_registration'))
+    test_suite.addTest(StarGuideBackendTest('test_04_user_login'))
+    test_suite.addTest(StarGuideBackendTest('test_05_protected_routes'))
+    test_suite.addTest(StarGuideBackendTest('test_06_adaptive_assessment'))
+    test_suite.addTest(StarGuideBackendTest('test_07_ai_tutoring'))
+    test_suite.addTest(StarGuideBackendTest('test_08_question_bank'))
+    test_suite.addTest(StarGuideBackendTest('test_09_study_groups'))
+    test_suite.addTest(StarGuideBackendTest('test_10_quiz_arena'))
+    test_suite.addTest(StarGuideBackendTest('test_11_chat_system'))
+    test_suite.addTest(StarGuideBackendTest('test_12_analytics_dashboard'))
+    test_suite.addTest(StarGuideBackendTest('test_13_enhanced_ai_features'))
+    test_suite.addTest(StarGuideBackendTest('test_14_rate_limiting'))
+    test_suite.addTest(StarGuideBackendTest('test_15_metrics_endpoint'))
+    test_suite.addTest(StarGuideBackendTest('test_16_comprehensive_health_check'))
+    test_suite.addTest(StarGuideBackendTest('test_17_structured_logging'))
+    test_suite.addTest(StarGuideBackendTest('test_18_security_middleware'))
+    test_suite.addTest(StarGuideBackendTest('test_19_cors_handling'))
+    
+    runner = unittest.TextTestRunner()
+    runner.run(test_suite)
