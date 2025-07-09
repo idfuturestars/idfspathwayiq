@@ -25,24 +25,44 @@ const AdaptiveSkillScan = () => {
   const navigate = useNavigate();
   
   // Session state
-  const [sessionId, setSessionId] = useState(null);
-  const [sessionStarted, setSessionStarted] = useState(false);
+  const [sessionId, setSessionId] = useState(() => {
+    // Check if there's a saved session ID in localStorage
+    const saved = localStorage.getItem('adaptiveSessionId');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [sessionStarted, setSessionStarted] = useState(() => {
+    // Check if there's a saved session state in localStorage
+    const saved = localStorage.getItem('adaptiveSessionStarted');
+    return saved ? JSON.parse(saved) : false;
+  });
   const [sessionComplete, setSessionComplete] = useState(false);
   
   // Question state
-  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [currentQuestion, setCurrentQuestion] = useState(() => {
+    // Check if there's a saved current question in localStorage
+    const saved = localStorage.getItem('adaptiveCurrentQuestion');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [selectedAnswer, setSelectedAnswer] = useState('');
-  const [questionNumber, setQuestionNumber] = useState(0);
+  const [questionNumber, setQuestionNumber] = useState(() => {
+    // Check if there's a saved question number in localStorage
+    const saved = localStorage.getItem('adaptiveQuestionNumber');
+    return saved ? JSON.parse(saved) : 0;
+  });
   const [loading, setLoading] = useState(false);
   
   // Assessment config
-  const [assessmentConfig, setAssessmentConfig] = useState({
-    subject: '',
-    target_grade_level: '',
-    assessment_type: 'talent_discovery',
-    enable_think_aloud: true,
-    enable_ai_help_tracking: true,
-    max_questions: 20
+  const [assessmentConfig, setAssessmentConfig] = useState(() => {
+    // Check if there's a saved assessment config in localStorage
+    const saved = localStorage.getItem('adaptiveAssessmentConfig');
+    return saved ? JSON.parse(saved) : {
+      subject: '',
+      target_grade_level: '',
+      assessment_type: 'talent_discovery',
+      enable_think_aloud: true,
+      enable_ai_help_tracking: true,
+      max_questions: 20
+    };
   });
   
   // Timer and interaction
