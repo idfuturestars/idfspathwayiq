@@ -536,21 +536,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Test restored application functionality"
-    - "Verify all 10 core features work"
-    - "Confirm AI integrations with provided API keys"
-    - "Test adaptive assessment engine"
-    - "Implement advanced AI features (Phase 1)"
-    - "Implement Rate Limiting System"
-    - "Implement Monitoring & Metrics"
-    - "Implement Security Middleware"
+    - "Fix frontend deployment error (CompassIcon import)"
+    - "Complete thematic rebranding from StarGuide to PathwayIQ"
+    - "Address assessment reload issue in AdaptiveSkillScan"
+    - "Test backend functionality after frontend fixes"
   stuck_tasks: 
     - "Frontend testing with Playwright"
-    - "Advanced AI features endpoints"
-    - "Rate Limiting System"
-    - "Monitoring & Metrics"
-    - "Security Middleware"
-  test_all: true
+    - "Assessment reload issue"
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
