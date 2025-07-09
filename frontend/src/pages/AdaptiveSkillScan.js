@@ -197,6 +197,9 @@ const AdaptiveSkillScan = () => {
       return;
     }
     
+    // Clear any existing session data
+    clearSessionStorage();
+    
     setLoading(true);
     try {
       const response = await axios.post(
