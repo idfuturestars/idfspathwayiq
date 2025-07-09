@@ -13,6 +13,7 @@ import unittest
 import os
 from datetime import datetime
 import sys
+import base64
 
 # Get the backend URL from the frontend .env file
 BACKEND_URL = "https://66256085-2a0b-48ac-a1c3-b48878d22fc4.preview.emergentagent.com/api"
