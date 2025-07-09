@@ -86,10 +86,66 @@ const AdaptiveSkillScan = () => {
   const [showAiHelper, setShowAiHelper] = useState(false);
   
   // Results and Analytics
-  const [sessionAnalytics, setSessionAnalytics] = useState(null);
-  const [abilityProgress, setAbilityProgress] = useState([]);
-  
-  // Available options
+  const [sessionAnalytics, setSessionAnalytics] = useState(() => {
+    // Check if there's saved session analytics in localStorage
+    const saved = localStorage.getItem('adaptiveSessionAnalytics');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [abilityProgress, setAbilityProgress] = useState(() => {
+    // Check if there's saved ability progress in localStorage
+    const saved = localStorage.getItem('adaptiveAbilityProgress');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('adaptiveSessionId', JSON.stringify(sessionId));
+  }, [sessionId]);
+
+  useEffect(() => {
+    localStorage.setItem('adaptiveSessionStarted', JSON.stringify(sessionStarted));
+  }, [sessionStarted]);
+
+  useEffect(() => {
+    localStorage.setItem('adaptiveCurrentQuestion', JSON.stringify(currentQuestion));
+  }, [currentQuestion]);
+
+  useEffect(() => {
+    localStorage.setItem('adaptiveQuestionNumber', JSON.stringify(questionNumber));
+  }, [questionNumber]);
+
+  useEffect(() => {
+    localStorage.setItem('adaptiveAssessmentConfig', JSON.stringify(assessmentConfig));
+  }, [assessmentConfig]);
+
+  useEffect(() => {
+    localStorage.setItem('adaptiveSessionAnalytics', JSON.stringify(sessionAnalytics));
+  }, [sessionAnalytics]);
+
+  useEffect(() => {
+    localStorage.setItem('adaptiveAbilityProgress', JSON.stringify(abilityProgress));
+  }, [abilityProgress]);
+
+  // Clear localStorage when starting a new session
+  const clearSessionStorage = () => {
+    localStorage.removeItem('adaptiveSessionId');
+    localStorage.removeItem('adaptiveSessionStarted');
+    localStorage.removeItem('adaptiveCurrentQuestion');
+    localStorage.removeItem('adaptiveQuestionNumber');
+    localStorage.removeItem('adaptiveAssessmentConfig');
+    localStorage.removeItem('adaptiveSessionAnalytics');
+    localStorage.removeItem('adaptiveAbilityProgress');
+  };
+
+  // Resume session if there's a saved session on mount
+  useEffect(() => {
+    if (sessionId && sessionStarted && !sessionComplete) {
+      // Resume the session by getting the next question
+      getNextQuestion(sessionId);
+    }
+  }, []);
+
+  // Results and Analytics
   const subjects = [
     'Mathematics', 'Science', 'Programming', 'Computer Science', 
     'Research Methods', 'Physics', 'English Language Arts'
