@@ -506,7 +506,9 @@ class StarGuideBackendTest(unittest.TestCase):
             chat_data = {
                 "message": "I'm feeling frustrated with this math problem.",
                 "emotional_context": "frustrated",
-                "learning_style": "visual"
+                "learning_style": "visual",
+                "ai_personality": "encouraging",
+                "session_id": None
             }
             
             response = requests.post(
@@ -519,8 +521,9 @@ class StarGuideBackendTest(unittest.TestCase):
             self.assertIn("response", data)
             self.assertIn("emotional_state_detected", data)
             print("✅ Enhanced AI chat working")
-        except AssertionError:
-            print("❌ Enhanced AI chat not working as expected")
+        except AssertionError as e:
+            print(f"❌ Enhanced AI chat not working as expected: {e}")
+            print(f"Response status: {response.status_code}, Response: {response.text[:200]}")
         
         # Test personalized learning path
         try:
@@ -540,21 +543,31 @@ class StarGuideBackendTest(unittest.TestCase):
             data = response.json()
             self.assertIn("personalized_curriculum", data)
             print("✅ Personalized learning path generation working")
-        except AssertionError:
-            print("❌ Personalized learning path not working as expected")
+        except AssertionError as e:
+            print(f"❌ Personalized learning path not working as expected: {e}")
+            print(f"Response status: {response.status_code}, Response: {response.text[:200]}")
         
         # Test learning style assessment
         try:
+            assessment_data = {
+                "responses": [
+                    {"question": "How do you prefer to learn new information?", "answer": "I like to see diagrams and charts"},
+                    {"question": "When solving a problem, what approach do you take?", "answer": "I visualize the problem"}
+                ]
+            }
+            
             response = requests.post(
                 f"{BACKEND_URL}/ai/learning-style-assessment",
-                headers=self.headers
+                headers=self.headers,
+                json=assessment_data
             )
             self.assertEqual(response.status_code, 200)
             data = response.json()
             self.assertIn("primary_learning_style", data)
             print("✅ Learning style assessment working")
-        except AssertionError:
-            print("❌ Learning style assessment not working as expected")
+        except AssertionError as e:
+            print(f"❌ Learning style assessment not working as expected: {e}")
+            print(f"Response status: {response.status_code}, Response: {response.text[:200]}")
         
         # Test emotional analytics
         try:
@@ -566,22 +579,32 @@ class StarGuideBackendTest(unittest.TestCase):
             data = response.json()
             self.assertIn("emotion_distribution", data)
             print("✅ Emotional analytics tracking working")
-        except AssertionError:
-            print("❌ Emotional analytics not working as expected")
+        except AssertionError as e:
+            print(f"❌ Emotional analytics not working as expected: {e}")
+            print(f"Response status: {response.status_code}, Response: {response.text[:200]}")
         
-        # Test voice-to-text (simulated since we can't send audio)
+        # Test voice-to-text (simulated since we can't send actual audio)
         try:
-            # This will likely fail since we can't send actual audio data in this test
-            # But we can check if the endpoint exists and returns the expected error
+            # Create a simple base64 encoded "audio" data
+            dummy_audio = base64.b64encode(b"This is a test audio").decode('utf-8')
+            
+            voice_data = {
+                "audio_data": dummy_audio,
+                "session_context": {"subject": "mathematics"}
+            }
+            
             response = requests.post(
                 f"{BACKEND_URL}/ai/voice-to-text",
-                headers=self.headers
+                headers=self.headers,
+                json=voice_data
             )
-            # Either a 400 (bad request) or 422 (validation error) is expected
-            self.assertIn(response.status_code, [400, 422])
-            print("✅ Voice-to-text endpoint exists (couldn't test fully without audio)")
-        except AssertionError:
-            print("❌ Voice-to-text endpoint not working as expected")
+            
+            # Either a 200 (success) or 422 (validation error) is expected
+            self.assertIn(response.status_code, [200, 422])
+            print(f"✅ Voice-to-text endpoint exists (status code: {response.status_code})")
+        except AssertionError as e:
+            print(f"❌ Voice-to-text endpoint not working as expected: {e}")
+            print(f"Response status: {response.status_code}, Response: {response.text[:200]}")
 
     def test_14_rate_limiting(self):
         """Test rate limiting functionality"""
