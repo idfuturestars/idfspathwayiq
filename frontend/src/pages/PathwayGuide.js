@@ -3,13 +3,11 @@ import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import {
   PaperAirplaneIcon,
-  MapIcon,
+  SparklesIcon,
   LightBulbIcon,
   BookOpenIcon,
   ChatBubbleLeftRightIcon,
-  ArrowPathIcon,
-  AcademicCapIcon,
-  BriefcaseIcon
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 
 const PathwayGuide = () => {
@@ -21,12 +19,12 @@ const PathwayGuide = () => {
   const messagesEndRef = useRef(null);
 
   const quickPrompts = [
-    "What career paths match my skills?",
-    "How do I become a data scientist?",
-    "What programming language should I learn first?",
-    "Show me college preparation steps",
-    "Explain different engineering paths",
-    "What are alternative learning options?"
+    "Help me choose a career path",
+    "What skills should I learn next?",
+    "How do I prepare for interviews?",
+    "Explain data structures for beginners",
+    "What's the best learning approach for me?",
+    "How to build a portfolio?"
   ];
 
   useEffect(() => {
@@ -34,7 +32,7 @@ const PathwayGuide = () => {
     setMessages([
       {
         role: 'assistant',
-        content: `Hello ${user?.username}! I'm your Pathway Guide, here to help you navigate your educational and career journey. Whether you're exploring K-12 paths, college preparation, career transitions, or skill development, I'm here to provide personalized guidance. What pathway would you like to explore today?`,
+        content: `Hello ${user?.username}! I'm your Pathway Guide™, your AI-powered learning companion. I'm here to help you navigate your learning journey, choose the right paths, and achieve your career goals. What would you like to explore today?`,
         timestamp: new Date()
       }
     ]);
@@ -62,16 +60,16 @@ const PathwayGuide = () => {
     setLoading(true);
 
     try {
-      // Use enhanced AI chat with pathway-focused context
+      // Use enhanced AI chat with emotional intelligence
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/ai/enhanced-chat`,
         {},
         {
           params: {
             message: message,
-            emotional_context: 'supportive',
-            learning_style: 'multimodal',
-            ai_personality: 'pathway_mentor',
+            emotional_context: 'focused', // Can be dynamic based on user input analysis
+            learning_style: 'multimodal', // Can be detected from user patterns
+            ai_personality: 'encouraging',
             session_id: sessionId
           }
         }
@@ -81,12 +79,12 @@ const PathwayGuide = () => {
         role: 'assistant',
         content: response.data.response,
         timestamp: new Date(),
-        // Enhanced pathway guidance data
+        // Enhanced data from Phase 1
         emotional_state: response.data.emotional_state_detected,
         learning_style: response.data.learning_style_detected,
         ai_personality: response.data.ai_personality_used,
-        pathway_suggestions: response.data.pathway_suggestions,
-        next_steps: response.data.next_steps
+        adaptations: response.data.adaptations_applied,
+        suggestions: response.data.next_suggestions
       };
 
       setMessages(prev => [...prev, aiMessage]);
@@ -97,7 +95,7 @@ const PathwayGuide = () => {
     } catch (error) {
       console.error('Failed to send message:', error);
       
-      // Fallback to original chat endpoint
+      // Fallback to original chat endpoint if enhanced chat fails
       try {
         const fallbackResponse = await axios.post(
           `${process.env.REACT_APP_BACKEND_URL}/api/ai/chat`,
@@ -144,7 +142,7 @@ const PathwayGuide = () => {
     setMessages([
       {
         role: 'assistant',
-        content: `Ready for a fresh start, ${user?.username}? Let's explore new pathways together. What educational or career goals would you like to discuss?`,
+        content: `Hi again ${user?.username}! Ready for a fresh conversation? What pathway would you like to explore today?`,
         timestamp: new Date()
       }
     ]);
@@ -152,6 +150,7 @@ const PathwayGuide = () => {
   };
 
   const formatMessage = (content) => {
+    // Basic markdown-like formatting
     return content
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -166,17 +165,17 @@ const PathwayGuide = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
-              <MapIcon className="w-8 h-8 text-blue-500 mr-3" />
-              Pathway Guide
+              <SparklesIcon className="w-8 h-8 text-blue-500 mr-3" />
+              Pathway Guide™
             </h1>
-            <p className="text-gray-400">Your personalized educational and career navigation assistant</p>
+            <p className="text-gray-400">Your AI-powered learning and career companion</p>
           </div>
           <button
             onClick={clearConversation}
             className="btn-secondary flex items-center"
           >
             <ArrowPathIcon className="w-4 h-4 mr-2" />
-            New Session
+            New Conversation
           </button>
         </div>
       </div>
@@ -195,7 +194,7 @@ const PathwayGuide = () => {
                   <div
                     className={`max-w-[80%] p-4 rounded-lg ${
                       message.role === 'user'
-                        ? 'bg-gray-700 text-white'
+                        ? 'bg-blue-600 text-white'
                         : message.isError
                         ? 'bg-red-600/20 border border-red-500 text-red-200'
                         : 'bg-gray-800 text-gray-100 border border-gray-700'
@@ -203,8 +202,8 @@ const PathwayGuide = () => {
                   >
                     {message.role === 'assistant' && !message.isError && (
                       <div className="flex items-center mb-2">
-                        <MapIcon className="w-4 h-4 text-blue-500 mr-2" />
-                        <span className="text-xs text-gray-400 font-medium">Pathway Guide</span>
+                        <SparklesIcon className="w-4 h-4 text-blue-500 mr-2" />
+                        <span className="text-xs text-gray-400 font-medium">Pathway Guide™</span>
                       </div>
                     )}
                     <div 
@@ -222,8 +221,8 @@ const PathwayGuide = () => {
                 <div className="flex justify-start">
                   <div className="bg-gray-800 border border-gray-700 p-4 rounded-lg">
                     <div className="flex items-center">
-                      <MapIcon className="w-4 h-4 text-blue-500 mr-2" />
-                      <span className="text-xs text-gray-400 font-medium mr-3">Pathway Guide</span>
+                      <SparklesIcon className="w-4 h-4 text-blue-500 mr-2" />
+                      <span className="text-xs text-gray-400 font-medium mr-3">Pathway Guide™</span>
                       <div className="loading-spinner w-4 h-4"></div>
                     </div>
                   </div>
@@ -242,7 +241,7 @@ const PathwayGuide = () => {
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Ask about career paths, education options, skill development..."
+                  placeholder="Ask about career paths, learning strategies, or skill development..."
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-400 resize-none focus:outline-none focus:border-blue-500"
                   rows="3"
                   disabled={loading}
@@ -261,7 +260,7 @@ const PathwayGuide = () => {
 
         {/* Sidebar */}
         <div className="w-80 space-y-6">
-          {/* Quick Questions */}
+          {/* Quick Prompts */}
           <div className="starguide-card">
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
               <LightBulbIcon className="w-5 h-5 text-blue-500 mr-2" />
@@ -281,47 +280,69 @@ const PathwayGuide = () => {
             </div>
           </div>
 
-          {/* Pathway Categories */}
+          {/* Learning Pathways */}
           <div className="starguide-card">
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-              <BookOpenIcon className="w-5 h-5 text-gray-400 mr-2" />
-              Pathway Categories
+              <BookOpenIcon className="w-5 h-5 text-green-500 mr-2" />
+              Popular Pathways
             </h3>
             <div className="space-y-3">
               {[
-                { category: 'Academic Pathways', icon: AcademicCapIcon, topics: ['K-12 Foundation', 'College Prep', 'Graduate School'] },
-                { category: 'Career Pathways', icon: BriefcaseIcon, topics: ['Technology', 'Healthcare', 'Business'] },
-                { category: 'Skill Development', icon: LightBulbIcon, topics: ['Programming', 'Data Science', 'Design'] },
-                { category: 'Alternative Routes', icon: MapIcon, topics: ['Bootcamps', 'Certifications', 'Self-Taught'] },
+                { pathway: 'Web Development', level: 'Beginner', color: 'bg-blue-500' },
+                { pathway: 'Data Science', level: 'Intermediate', color: 'bg-green-500' },
+                { pathway: 'AI/Machine Learning', level: 'Advanced', color: 'bg-purple-500' },
+                { pathway: 'Cloud Computing', level: 'Intermediate', color: 'bg-orange-500' },
+                { pathway: 'Cybersecurity', level: 'Advanced', color: 'bg-red-500' },
               ].map((item, index) => (
-                <div key={index} className="bg-gray-800 rounded-lg p-3">
-                  <div className="flex items-center mb-2">
-                    <item.icon className="w-5 h-5 text-gray-400 mr-2" />
-                    <span className="text-white font-medium">{item.category}</span>
+                <button
+                  key={index}
+                  onClick={() => handleSendMessage(`Tell me about the ${item.pathway} pathway for ${item.level} level`)}
+                  className="w-full text-left p-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+                  disabled={loading}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-white font-medium">{item.pathway}</span>
+                    <span className={`text-xs px-2 py-1 rounded ${item.color} text-white`}>
+                      {item.level}
+                    </span>
                   </div>
-                  <div className="space-y-1">
-                    {item.topics.map((topic, topicIndex) => (
-                      <button
-                        key={topicIndex}
-                        onClick={() => handleSendMessage(`Tell me about ${topic} pathways`)}
-                        className="block w-full text-left text-sm text-gray-400 hover:text-white transition-colors"
-                        disabled={loading}
-                      >
-                        • {topic}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>
 
-          {/* Session Progress */}
+          {/* Tips */}
+          <div className="starguide-card">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+              <ChatBubbleLeftRightIcon className="w-5 h-5 text-purple-500 mr-2" />
+              Tips for Better Guidance
+            </h3>
+            <div className="space-y-3 text-sm text-gray-300">
+              <div className="flex items-start">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <p>Share your current skills and goals</p>
+              </div>
+              <div className="flex items-start">
+                <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <p>Ask about specific career paths or industries</p>
+              </div>
+              <div className="flex items-start">
+                <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <p>Request learning roadmaps and resources</p>
+              </div>
+              <div className="flex items-start">
+                <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <p>Ask about market trends and opportunities</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Session Stats */}
           <div className="starguide-card">
             <h3 className="text-lg font-semibold text-white mb-4">Session Progress</h3>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-gray-400">Messages Exchanged</span>
+                <span className="text-gray-400">Messages</span>
                 <span className="text-white font-medium">{messages.length}</span>
               </div>
               <div className="flex justify-between">
@@ -329,8 +350,8 @@ const PathwayGuide = () => {
                 <span className="text-blue-500 font-medium">Level {user?.level}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Progress Points</span>
-                <span className="text-gray-400 font-medium">{user?.xp}</span>
+                <span className="text-gray-400">Total XP</span>
+                <span className="text-green-500 font-medium">{user?.xp}</span>
               </div>
             </div>
           </div>

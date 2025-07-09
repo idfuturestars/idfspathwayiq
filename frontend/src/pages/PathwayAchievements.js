@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import {
-  TrophyIcon,
   StarIcon,
+  TrophyIcon,
   FireIcon,
   BookOpenIcon,
   UserGroupIcon,
@@ -10,9 +10,7 @@ import {
   LightBulbIcon,
   RocketLaunchIcon,
   ShieldCheckIcon,
-  AcademicCapIcon,
-  BriefcaseIcon,
-  MapIcon
+  GlobeAltIcon
 } from '@heroicons/react/24/outline';
 
 const PathwayAchievements = () => {
@@ -20,124 +18,125 @@ const PathwayAchievements = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedRarity, setSelectedRarity] = useState('all');
 
+  // Mock achievements data
   const achievements = [
-    // Learning Pathway Achievements
+    // Learning Achievements
     {
       id: 1,
       name: 'First Steps',
-      description: 'Begin your learning journey',
+      description: 'Complete your first question',
       icon: '🚀',
-      category: 'pathway',
+      category: 'learning',
       rarity: 'common',
-      requirement: 'Complete first assessment',
+      requirement: 'Answer 1 question',
       earned: true,
       earnedDate: '2024-01-15',
       progress: 1,
       maxProgress: 1,
-      progressPoints: 25
+      xpReward: 25
     },
     {
       id: 2,
-      name: 'Knowledge Seeker',
-      description: 'Complete 10 learning modules',
-      icon: '📚',
-      category: 'pathway',
+      name: 'Quick Learner',
+      description: 'Answer 10 questions correctly',
+      icon: '⚡',
+      category: 'learning',
       rarity: 'common',
-      requirement: 'Complete 10 learning modules',
+      requirement: 'Answer 10 questions correctly',
       earned: true,
       earnedDate: '2024-01-18',
       progress: 10,
       maxProgress: 10,
-      progressPoints: 50
+      xpReward: 50
     },
     {
       id: 3,
-      name: 'Pathway Navigator',
-      description: 'Explore 3 different learning pathways',
-      icon: '🗺️',
-      category: 'pathway',
+      name: 'Knowledge Seeker',
+      description: 'Answer 100 questions correctly',
+      icon: '📚',
+      category: 'learning',
       rarity: 'rare',
-      requirement: 'Explore 3 different pathways',
+      requirement: 'Answer 100 questions correctly',
       earned: false,
-      progress: 2,
-      maxProgress: 3,
-      progressPoints: 100
+      progress: 67,
+      maxProgress: 100,
+      xpReward: 200
     },
     {
       id: 4,
-      name: 'Skill Builder',
-      description: 'Master 5 core skills',
-      icon: '🔧',
-      category: 'pathway',
-      rarity: 'rare',
-      requirement: 'Master 5 core skills',
+      name: 'Pathway Navigator',
+      description: 'Answer 500 questions correctly',
+      icon: '🗺️',
+      category: 'learning',
+      rarity: 'epic',
+      requirement: 'Answer 500 questions correctly',
       earned: false,
-      progress: 3,
-      maxProgress: 5,
-      progressPoints: 150
+      progress: 67,
+      maxProgress: 500,
+      xpReward: 500
     },
     {
       id: 5,
-      name: 'Pathway Master',
-      description: 'Complete an entire learning pathway',
+      name: 'Master Navigator',
+      description: 'Answer 1000 questions correctly',
       icon: '👑',
-      category: 'pathway',
-      rarity: 'epic',
-      requirement: 'Complete full pathway',
+      category: 'learning',
+      rarity: 'legendary',
+      requirement: 'Answer 1000 questions correctly',
       earned: false,
-      progress: 0,
-      maxProgress: 1,
-      progressPoints: 500
+      progress: 67,
+      maxProgress: 1000,
+      xpReward: 1000
     },
 
-    // Career Development Achievements
+    // Streak Achievements
     {
       id: 6,
-      name: 'Career Explorer',
-      description: 'Research 5 career options',
-      icon: '🔍',
-      category: 'career',
+      name: 'Consistency',
+      description: 'Maintain a 3-day learning streak',
+      icon: '🔥',
+      category: 'streak',
       rarity: 'common',
-      requirement: 'Research 5 career options',
+      requirement: 'Learn for 3 consecutive days',
       earned: true,
       earnedDate: '2024-01-17',
-      progress: 5,
-      maxProgress: 5,
-      progressPoints: 75
+      progress: 3,
+      maxProgress: 3,
+      xpReward: 75
     },
     {
       id: 7,
-      name: 'Industry Insider',
-      description: 'Connect with 3 professionals in your field',
-      icon: '🤝',
-      category: 'career',
+      name: 'Dedicated',
+      description: 'Maintain a 7-day learning streak',
+      icon: '🌟',
+      category: 'streak',
       rarity: 'rare',
-      requirement: 'Connect with 3 professionals',
+      requirement: 'Learn for 7 consecutive days',
       earned: false,
-      progress: 1,
-      maxProgress: 3,
-      progressPoints: 125
+      progress: user?.streak_days || 5,
+      maxProgress: 7,
+      xpReward: 150
     },
     {
       id: 8,
-      name: 'Career Changer',
-      description: 'Successfully transition to a new career path',
-      icon: '🔄',
-      category: 'career',
+      name: 'Unstoppable',
+      description: 'Maintain a 30-day learning streak',
+      icon: '💪',
+      category: 'streak',
       rarity: 'epic',
-      requirement: 'Complete career transition',
+      requirement: 'Learn for 30 consecutive days',
       earned: false,
-      progress: 0,
-      maxProgress: 1,
-      progressPoints: 400
+      progress: user?.streak_days || 5,
+      maxProgress: 30,
+      xpReward: 500
     },
 
-    // Social Learning Achievements
+    // Social Achievements
     {
       id: 9,
-      name: 'Circle Member',
+      name: 'Team Player',
       description: 'Join your first learning circle',
-      icon: '👥',
+      icon: '🤝',
       category: 'social',
       rarity: 'common',
       requirement: 'Join 1 learning circle',
@@ -145,121 +144,120 @@ const PathwayAchievements = () => {
       earnedDate: '2024-01-20',
       progress: 1,
       maxProgress: 1,
-      progressPoints: 50
+      xpReward: 50
     },
     {
       id: 10,
-      name: 'Community Builder',
-      description: 'Create a learning circle',
-      icon: '🏗️',
+      name: 'Collaborator',
+      description: 'Join 5 learning circles',
+      icon: '👥',
       category: 'social',
       rarity: 'rare',
-      requirement: 'Create 1 learning circle',
-      earned: false,
-      progress: 0,
-      maxProgress: 1,
-      progressPoints: 150
-    },
-    {
-      id: 11,
-      name: 'Mentor',
-      description: 'Help 10 fellow learners',
-      icon: '🎯',
-      category: 'social',
-      rarity: 'epic',
-      requirement: 'Mentor 10 learners',
+      requirement: 'Join 5 learning circles',
       earned: false,
       progress: 3,
-      maxProgress: 10,
-      progressPoints: 300
+      maxProgress: 5,
+      xpReward: 150
     },
 
-    // Academic Achievements
+    // Skill Achievements
     {
-      id: 12,
-      name: 'Academic Achiever',
-      description: 'Maintain 90% average on assessments',
-      icon: '🎓',
-      category: 'academic',
-      rarity: 'rare',
-      requirement: 'Maintain 90% average',
+      id: 11,
+      name: 'JavaScript Novice',
+      description: 'Complete 25 JavaScript questions',
+      icon: '📜',
+      category: 'skill',
+      rarity: 'common',
+      requirement: 'Complete 25 JavaScript questions',
       earned: true,
       earnedDate: '2024-01-19',
-      progress: 92,
-      maxProgress: 90,
-      progressPoints: 200
+      progress: 25,
+      maxProgress: 25,
+      xpReward: 100
+    },
+    {
+      id: 12,
+      name: 'Python Explorer',
+      description: 'Complete 25 Python questions',
+      icon: '🐍',
+      category: 'skill',
+      rarity: 'common',
+      requirement: 'Complete 25 Python questions',
+      earned: false,
+      progress: 12,
+      maxProgress: 25,
+      xpReward: 100
     },
     {
       id: 13,
-      name: 'Research Scholar',
-      description: 'Complete advanced research project',
-      icon: '🔬',
-      category: 'academic',
-      rarity: 'epic',
-      requirement: 'Complete research project',
+      name: 'React Warrior',
+      description: 'Complete 50 React questions',
+      icon: '⚛️',
+      category: 'skill',
+      rarity: 'rare',
+      requirement: 'Complete 50 React questions',
+      earned: false,
+      progress: 8,
+      maxProgress: 50,
+      xpReward: 200
+    },
+
+    // Special Achievements
+    {
+      id: 14,
+      name: 'Speed Demon',
+      description: 'Answer 10 questions in under 5 minutes',
+      icon: '⚡',
+      category: 'special',
+      rarity: 'rare',
+      requirement: 'Answer 10 questions in under 5 minutes',
       earned: false,
       progress: 0,
       maxProgress: 1,
-      progressPoints: 350
-    },
-
-    // Consistency Achievements
-    {
-      id: 14,
-      name: 'Consistency Champion',
-      description: 'Maintain a 7-day learning streak',
-      icon: '🔥',
-      category: 'consistency',
-      rarity: 'common',
-      requirement: 'Learn for 7 consecutive days',
-      earned: true,
-      earnedDate: '2024-01-22',
-      progress: 7,
-      maxProgress: 7,
-      progressPoints: 100
+      xpReward: 200
     },
     {
       id: 15,
-      name: 'Dedicated Learner',
-      description: 'Maintain a 30-day learning streak',
-      icon: '💪',
-      category: 'consistency',
-      rarity: 'rare',
-      requirement: 'Learn for 30 consecutive days',
+      name: 'Perfect Score',
+      description: 'Get 100% on a Talent Compass assessment',
+      icon: '💯',
+      category: 'special',
+      rarity: 'epic',
+      requirement: 'Score 100% on any assessment',
       earned: false,
-      progress: user?.streak_days || 12,
-      maxProgress: 30,
-      progressPoints: 250
+      progress: 0,
+      maxProgress: 1,
+      xpReward: 300
     },
     {
       id: 16,
-      name: 'Lifetime Learner',
-      description: 'Maintain a 100-day learning streak',
-      icon: '⭐',
-      category: 'consistency',
-      rarity: 'legendary',
-      requirement: 'Learn for 100 consecutive days',
+      name: 'Guide Helper',
+      description: 'Have 50 conversations with Pathway Guide',
+      icon: '🧠',
+      category: 'special',
+      rarity: 'rare',
+      requirement: 'Chat with Pathway Guide 50 times',
       earned: false,
-      progress: user?.streak_days || 12,
-      maxProgress: 100,
-      progressPoints: 1000
+      progress: 23,
+      maxProgress: 50,
+      xpReward: 250
     }
   ];
 
   const categories = [
-    { id: 'all', label: 'All Achievements', icon: TrophyIcon },
-    { id: 'pathway', label: 'Learning Pathways', icon: MapIcon },
-    { id: 'career', label: 'Career Development', icon: BriefcaseIcon },
-    { id: 'social', label: 'Social Learning', icon: UserGroupIcon },
-    { id: 'academic', label: 'Academic Excellence', icon: AcademicCapIcon },
-    { id: 'consistency', label: 'Consistency', icon: FireIcon }
+    { id: 'all', label: 'All Achievements', icon: StarIcon },
+    { id: 'learning', label: 'Learning', icon: BookOpenIcon },
+    { id: 'streak', label: 'Streaks', icon: FireIcon },
+    { id: 'social', label: 'Social', icon: UserGroupIcon },
+    { id: 'skill', label: 'Skills', icon: LightBulbIcon },
+    { id: 'special', label: 'Special', icon: TrophyIcon }
   ];
 
   const rarities = [
     { id: 'all', label: 'All Rarities' },
     { id: 'common', label: 'Common', color: 'bg-gray-500' },
-    { id: 'rare', label: 'Rare', color: 'bg-gray-400' },
-    { id: 'epic', label: 'Epic', color: 'bg-white' },
+    { id: 'rare', label: 'Rare', color: 'bg-blue-500' },
+    { id: 'epic', label: 'Epic', color: 'bg-purple-500' },
     { id: 'legendary', label: 'Legendary', color: 'bg-yellow-500' }
   ];
 
@@ -274,9 +272,9 @@ const PathwayAchievements = () => {
 
   const getRarityColor = (rarity) => {
     switch (rarity) {
-      case 'legendary': return 'bg-gradient-to-br from-yellow-400 to-yellow-600';
-      case 'epic': return 'bg-gradient-to-br from-white to-gray-200';
-      case 'rare': return 'bg-gradient-to-br from-gray-400 to-gray-500';
+      case 'legendary': return 'bg-gradient-to-br from-yellow-400 to-orange-500';
+      case 'epic': return 'bg-gradient-to-br from-purple-500 to-pink-500';
+      case 'rare': return 'bg-gradient-to-br from-blue-500 to-cyan-500';
       case 'common': return 'bg-gradient-to-br from-gray-500 to-gray-600';
       default: return 'bg-gray-700';
     }
@@ -284,10 +282,10 @@ const PathwayAchievements = () => {
 
   const getRarityBorder = (rarity) => {
     switch (rarity) {
-      case 'legendary': return 'border-yellow-400';
-      case 'epic': return 'border-white';
-      case 'rare': return 'border-gray-400';
-      case 'common': return 'border-gray-500';
+      case 'legendary': return 'border-yellow-400 shadow-yellow-400/20';
+      case 'epic': return 'border-purple-500 shadow-purple-500/20';
+      case 'rare': return 'border-blue-500 shadow-blue-500/20';
+      case 'common': return 'border-gray-500 shadow-gray-500/20';
       default: return 'border-gray-700';
     }
   };
@@ -302,7 +300,7 @@ const PathwayAchievements = () => {
     >
       {achievement.earned && (
         <div className="absolute -top-2 -right-2">
-          <div className="w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center">
+          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
             <ShieldCheckIcon className="w-4 h-4 text-white" />
           </div>
         </div>
@@ -325,8 +323,8 @@ const PathwayAchievements = () => {
 
         <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-4 ${
           achievement.rarity === 'legendary' ? 'bg-yellow-500/20 text-yellow-300' :
-          achievement.rarity === 'epic' ? 'bg-white/20 text-white' :
-          achievement.rarity === 'rare' ? 'bg-gray-400/20 text-gray-300' :
+          achievement.rarity === 'epic' ? 'bg-purple-500/20 text-purple-300' :
+          achievement.rarity === 'rare' ? 'bg-blue-500/20 text-blue-300' :
           'bg-gray-500/20 text-gray-300'
         }`}>
           {achievement.rarity.charAt(0).toUpperCase() + achievement.rarity.slice(1)}
@@ -334,12 +332,12 @@ const PathwayAchievements = () => {
 
         {achievement.earned ? (
           <div className="space-y-2">
-            <div className="flex items-center justify-center text-gray-400 text-sm">
+            <div className="flex items-center justify-center text-green-500 text-sm">
               <TrophyIcon className="w-4 h-4 mr-1" />
               Earned {achievement.earnedDate}
             </div>
-            <div className="text-gray-300 text-sm">
-              +{achievement.progressPoints} Points
+            <div className="text-blue-400 text-sm">
+              +{achievement.xpReward} XP
             </div>
           </div>
         ) : (
@@ -355,14 +353,14 @@ const PathwayAchievements = () => {
                 </div>
                 <div className="w-full bg-gray-700 rounded-full h-2">
                   <div
-                    className="bg-gray-500 h-2 rounded-full transition-all duration-300"
+                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}
                   />
                 </div>
               </div>
             )}
             <div className="text-gray-500 text-sm">
-              Reward: +{achievement.progressPoints} Points
+              Reward: +{achievement.xpReward} XP
             </div>
           </div>
         )}
@@ -376,10 +374,10 @@ const PathwayAchievements = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
-            <TrophyIcon className="w-8 h-8 text-gray-400 mr-3" />
-            Pathway Achievements
+            <StarIcon className="w-8 h-8 text-yellow-500 mr-3" />
+            Pathway Achievements™
           </h1>
-          <p className="text-gray-400">Showcase your learning milestones and unlock new challenges</p>
+          <p className="text-gray-400">Showcase your learning journey milestones</p>
         </div>
         
         <div className="text-center">
@@ -390,7 +388,7 @@ const PathwayAchievements = () => {
 
       {/* Progress Overview */}
       <div className="starguide-card">
-        <h2 className="text-xl font-semibold text-white mb-4">Achievement Progress</h2>
+        <h2 className="text-xl font-semibold text-white mb-4">Achievement Collection Progress</h2>
         
         <div className="mb-6">
           <div className="flex justify-between text-sm mb-2">
@@ -399,7 +397,7 @@ const PathwayAchievements = () => {
           </div>
           <div className="progress-bar">
             <div 
-              className="bg-gray-500 h-2 rounded-full transition-all duration-300" 
+              className="progress-fill" 
               style={{ width: `${(earnedAchievements.length / totalAchievements) * 100}%` }}
             />
           </div>
@@ -407,8 +405,8 @@ const PathwayAchievements = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {rarities.slice(1).map(rarity => {
-            const earned = earnedAchievements.filter(a => a.rarity === rarity.id).length;
-            const total = achievements.filter(a => a.rarity === rarity.id).length;
+            const earned = earnedAchievements.filter(b => b.rarity === rarity.id).length;
+            const total = achievements.filter(b => b.rarity === rarity.id).length;
             return (
               <div key={rarity.id} className="text-center">
                 <div className={`w-4 h-4 ${rarity.color} rounded-full mx-auto mb-2`} />
@@ -432,7 +430,7 @@ const PathwayAchievements = () => {
                   onClick={() => setSelectedCategory(category.id)}
                   className={`flex items-center px-3 py-2 rounded-lg text-sm transition-colors ${
                     selectedCategory === category.id
-                      ? 'bg-gray-600 text-white'
+                      ? 'bg-blue-500 text-white'
                       : 'bg-gray-800 text-gray-300 hover:text-white'
                   }`}
                 >
@@ -468,21 +466,21 @@ const PathwayAchievements = () => {
       {/* Achievement Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="starguide-card text-center">
-          <TrophyIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <TrophyIcon className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
           <h3 className="text-2xl font-bold text-white mb-2">{earnedAchievements.length}</h3>
           <p className="text-gray-400">Achievements Earned</p>
         </div>
         
         <div className="starguide-card text-center">
-          <RocketLaunchIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <RocketLaunchIcon className="w-12 h-12 text-blue-500 mx-auto mb-4" />
           <h3 className="text-2xl font-bold text-white mb-2">
-            {earnedAchievements.reduce((sum, achievement) => sum + achievement.progressPoints, 0)}
+            {earnedAchievements.reduce((sum, achievement) => sum + achievement.xpReward, 0)}
           </h3>
-          <p className="text-gray-400">Points from Achievements</p>
+          <p className="text-gray-400">XP from Achievements</p>
         </div>
         
         <div className="starguide-card text-center">
-          <StarIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <GlobeAltIcon className="w-12 h-12 text-green-500 mx-auto mb-4" />
           <h3 className="text-2xl font-bold text-white mb-2">
             {Math.round((earnedAchievements.length / totalAchievements) * 100)}%
           </h3>
