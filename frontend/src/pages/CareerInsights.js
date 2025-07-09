@@ -307,7 +307,7 @@ const CareerInsights = () => {
             {/* Market Trends */}
             <div className="starguide-card">
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
-                <TrendingUpIcon className="w-6 h-6 text-gray-400 mr-2" />
+                <ArrowTrendingUpIcon className="w-6 h-6 text-gray-400 mr-2" />
                 Market Trends
               </h2>
               
