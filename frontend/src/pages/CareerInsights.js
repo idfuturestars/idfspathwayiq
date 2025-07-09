@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import {
   BriefcaseIcon,
   ChartBarIcon,
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   CurrencyDollarIcon,
   MapPinIcon,
   ClockIcon,
