@@ -237,7 +237,7 @@ const CareerInsights = () => {
             </div>
             
             <div className="starguide-card text-center">
-              <TrendingUpIcon className="w-8 h-8 text-gray-400 mx-auto mb-3" />
+              <ArrowTrendingUpIcon className="w-8 h-8 text-gray-400 mx-auto mb-3" />
               <h3 className="text-2xl font-bold text-white mb-1">
                 +{careerData.overview.growth_rate}%
               </h3>
