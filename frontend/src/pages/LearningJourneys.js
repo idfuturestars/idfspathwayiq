@@ -9,8 +9,8 @@ import {
   PlayIcon,
   PlusIcon,
   MagnifyingGlassIcon,
-  AcademicCapIcon,
-  BriefcaseIcon
+  FilterIcon,
+  StarIcon
 } from '@heroicons/react/24/outline';
 
 const LearningJourneys = () => {
@@ -26,57 +26,57 @@ const LearningJourneys = () => {
   const mockJourneys = [
     {
       id: '1',
-      name: 'Web Development Pathway',
-      description: 'Complete journey from HTML basics to full-stack development',
-      subject: 'Web Development',
+      name: 'JavaScript Mastery Path',
+      description: 'Master JavaScript fundamentals through hands-on challenges and projects',
+      subject: 'JavaScript',
       difficulty: 'beginner',
-      max_participants: 25,
+      max_participants: 20,
       participants: ['user1', 'user2', 'user3'],
-      milestones: 12,
-      estimated_duration: '8 weeks',
+      questions_per_game: 15,
+      time_per_question: 30,
       created_by: 'instructor1',
       is_active: true,
-      pathway_code: 'WEB001',
-      creator_name: 'Prof. Chen',
-      estimated_time: '45 min per session',
-      progress_points: 200,
-      pathway_type: 'career'
+      room_code: 'JS001',
+      creator_name: 'Prof. Smith',
+      estimated_time: '25 min',
+      xp_reward: 150,
+      achievement_reward: 'JavaScript Explorer'
     },
     {
       id: '2',
-      name: 'Data Science Discovery',
-      description: 'Explore data science fundamentals and career opportunities',
-      subject: 'Data Science',
+      name: 'React Development Journey',
+      description: 'Build modern web applications with React and component-based architecture',
+      subject: 'React',
       difficulty: 'intermediate',
-      max_participants: 20,
+      max_participants: 15,
       participants: ['user4', 'user5'],
-      milestones: 15,
-      estimated_duration: '10 weeks',
+      questions_per_game: 20,
+      time_per_question: 45,
       created_by: 'instructor2',
       is_active: true,
-      pathway_code: 'DS002',
-      creator_name: 'Dr. Rodriguez',
-      estimated_time: '60 min per session',
-      progress_points: 350,
-      pathway_type: 'career'
+      room_code: 'REACT02',
+      creator_name: 'Dr. Johnson',
+      estimated_time: '35 min',
+      xp_reward: 250,
+      achievement_reward: 'React Champion'
     },
     {
       id: '3',
-      name: 'College Preparation Track',
-      description: 'Comprehensive preparation for college applications and entrance exams',
-      subject: 'Academic Prep',
-      difficulty: 'intermediate',
-      max_participants: 30,
+      name: 'Python Data Science Path',
+      description: 'Explore data science concepts and machine learning with Python',
+      subject: 'Python',
+      difficulty: 'advanced',
+      max_participants: 10,
       participants: ['user6', 'user7', 'user8', 'user9'],
-      milestones: 20,
-      estimated_duration: '16 weeks',
+      questions_per_game: 25,
+      time_per_question: 60,
       created_by: 'instructor3',
       is_active: true,
-      pathway_code: 'PREP003',
-      creator_name: 'Prof. Johnson',
-      estimated_time: '90 min per session',
-      progress_points: 500,
-      pathway_type: 'academic'
+      room_code: 'PY003',
+      creator_name: 'Prof. Williams',
+      estimated_time: '45 min',
+      xp_reward: 350,
+      achievement_reward: 'Python Master'
     }
   ];
 
@@ -87,7 +87,7 @@ const LearningJourneys = () => {
   const loadJourneys = async () => {
     setLoading(true);
     try {
-      // Use mock data for now
+      // For now, use mock data since backend might not have journey data yet
       setTimeout(() => {
         setJourneys(mockJourneys);
         setLoading(false);
@@ -99,13 +99,14 @@ const LearningJourneys = () => {
     }
   };
 
-  const handleJoinJourney = async (journeyId, pathwayCode) => {
+  const handleJoinJourney = async (journeyId, roomCode) => {
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/learning-journeys/${pathwayCode}/join`);
-      alert(`Successfully joined learning journey! Pathway code: ${pathwayCode}`);
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/quiz-rooms/${roomCode}/join`);
+      // Redirect to journey room or update UI
+      alert(`Successfully joined journey! Room code: ${roomCode}`);
     } catch (error) {
       console.error('Failed to join journey:', error);
-      alert('Failed to join learning journey. Please try again.');
+      alert('Failed to join journey. Please try again.');
     }
   };
 
@@ -120,95 +121,89 @@ const LearningJourneys = () => {
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
-      case 'beginner': return 'bg-gray-600';
-      case 'intermediate': return 'bg-gray-500';
-      case 'advanced': return 'bg-gray-400';
-      case 'expert': return 'bg-white text-black';
-      default: return 'bg-gray-600';
+      case 'beginner': return 'bg-green-500';
+      case 'intermediate': return 'bg-yellow-500';
+      case 'advanced': return 'bg-red-500';
+      case 'expert': return 'bg-purple-500';
+      default: return 'bg-gray-500';
     }
   };
 
-  const getPathwayTypeIcon = (type) => {
-    return type === 'academic' ? AcademicCapIcon : BriefcaseIcon;
-  };
-
-  const JourneyCard = ({ journey }) => {
-    const TypeIcon = getPathwayTypeIcon(journey.pathway_type);
-    
-    return (
-      <div className="starguide-card group hover:border-gray-500 transition-all duration-300">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
-            <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-gray-300 transition-colors">
-              {journey.name}
-            </h3>
-            <p className="text-gray-400 text-sm mb-3">{journey.description}</p>
-            
-            <div className="flex items-center space-x-4 mb-4">
-              <span className={`badge ${getDifficultyColor(journey.difficulty)}`}>
-                {journey.difficulty}
-              </span>
-              <span className="badge bg-gray-700 text-gray-300">{journey.subject}</span>
-              <span className="text-gray-400 text-sm">by {journey.creator_name}</span>
-            </div>
-          </div>
+  const JourneyCard = ({ journey }) => (
+    <div className="starguide-card group hover:border-blue-500/30 transition-all duration-300">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1">
+          <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-blue-400 transition-colors">
+            {journey.name}
+          </h3>
+          <p className="text-gray-400 text-sm mb-3">{journey.description}</p>
           
-          <div className="text-right">
-            <div className="text-gray-300 font-bold text-lg">+{journey.progress_points} Points</div>
-            <div className="text-gray-400 text-sm flex items-center mt-1">
-              <TypeIcon className="w-4 h-4 mr-1" />
-              {journey.pathway_type}
+          <div className="flex items-center space-x-4 mb-4">
+            <span className={`badge ${getDifficultyColor(journey.difficulty)} text-white`}>
+              {journey.difficulty}
+            </span>
+            <span className="badge badge-info">{journey.subject}</span>
+            <span className="text-gray-400 text-sm">by {journey.creator_name}</span>
+          </div>
+        </div>
+        
+        <div className="text-right">
+          <div className="text-blue-500 font-bold text-lg">+{journey.xp_reward} XP</div>
+          {journey.achievement_reward && (
+            <div className="text-yellow-500 text-sm flex items-center mt-1">
+              <StarIcon className="w-4 h-4 mr-1" />
+              {journey.achievement_reward}
             </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-sm">
-          <div className="flex items-center text-gray-400">
-            <UsersIcon className="w-4 h-4 mr-1" />
-            {journey.participants.length}/{journey.max_participants}
-          </div>
-          <div className="flex items-center text-gray-400">
-            <ClockIcon className="w-4 h-4 mr-1" />
-            {journey.estimated_duration}
-          </div>
-          <div className="flex items-center text-gray-400">
-            <TrophyIcon className="w-4 h-4 mr-1" />
-            {journey.milestones} milestones
-          </div>
-          <div className="text-gray-400">
-            Code: <span className="font-mono text-white">{journey.pathway_code}</span>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex -space-x-2">
-            {journey.participants.slice(0, 3).map((participant, index) => (
-              <div
-                key={index}
-                className="w-8 h-8 bg-gradient-to-r from-gray-600 to-gray-700 rounded-full border-2 border-gray-800 flex items-center justify-center text-white text-xs font-bold"
-              >
-                {participant.charAt(0).toUpperCase()}
-              </div>
-            ))}
-            {journey.participants.length > 3 && (
-              <div className="w-8 h-8 bg-gray-700 rounded-full border-2 border-gray-800 flex items-center justify-center text-white text-xs">
-                +{journey.participants.length - 3}
-              </div>
-            )}
-          </div>
-
-          <button
-            onClick={() => handleJoinJourney(journey.id, journey.pathway_code)}
-            disabled={journey.participants.length >= journey.max_participants}
-            className="btn-primary"
-          >
-            <PlayIcon className="w-4 h-4 mr-2" />
-            Join Journey
-          </button>
+          )}
         </div>
       </div>
-    );
-  };
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-sm">
+        <div className="flex items-center text-gray-400">
+          <UsersIcon className="w-4 h-4 mr-1" />
+          {journey.participants.length}/{journey.max_participants}
+        </div>
+        <div className="flex items-center text-gray-400">
+          <ClockIcon className="w-4 h-4 mr-1" />
+          {journey.estimated_time}
+        </div>
+        <div className="flex items-center text-gray-400">
+          <TrophyIcon className="w-4 h-4 mr-1" />
+          {journey.questions_per_game} questions
+        </div>
+        <div className="text-gray-400">
+          Code: <span className="font-mono text-white">{journey.room_code}</span>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <div className="flex -space-x-2">
+          {journey.participants.slice(0, 3).map((participant, index) => (
+            <div
+              key={index}
+              className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full border-2 border-gray-800 flex items-center justify-center text-white text-xs font-bold"
+            >
+              {participant.charAt(0).toUpperCase()}
+            </div>
+          ))}
+          {journey.participants.length > 3 && (
+            <div className="w-8 h-8 bg-gray-700 rounded-full border-2 border-gray-800 flex items-center justify-center text-white text-xs">
+              +{journey.participants.length - 3}
+            </div>
+          )}
+        </div>
+
+        <button
+          onClick={() => handleJoinJourney(journey.id, journey.room_code)}
+          disabled={journey.participants.length >= journey.max_participants}
+          className="btn-primary"
+        >
+          <PlayIcon className="w-4 h-4 mr-2" />
+          Start Journey
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -216,10 +211,10 @@ const LearningJourneys = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
-            <MapIcon className="w-8 h-8 text-gray-400 mr-3" />
+            <MapIcon className="w-8 h-8 text-blue-500 mr-3" />
             Learning Journeys
           </h1>
-          <p className="text-gray-400">Structured pathways for educational and career development</p>
+          <p className="text-gray-400">Navigate your path to mastery</p>
         </div>
         
         <button
@@ -243,13 +238,13 @@ const LearningJourneys = () => {
             onClick={() => setActiveTab(tab.id)}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
               activeTab === tab.id
-                ? 'bg-gray-700 text-white'
+                ? 'bg-blue-500 text-white'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
             {tab.label}
             {tab.count > 0 && (
-              <span className="ml-2 bg-gray-600 px-2 py-0.5 rounded-full text-xs">
+              <span className="ml-2 bg-gray-700 px-2 py-0.5 rounded-full text-xs">
                 {tab.count}
               </span>
             )}
@@ -265,7 +260,7 @@ const LearningJourneys = () => {
               <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search learning journeys..."
+                placeholder="Search journeys by name or description..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="form-input pl-10"
@@ -280,11 +275,11 @@ const LearningJourneys = () => {
               className="form-input"
             >
               <option value="">All Subjects</option>
-              <option value="Web Development">Web Development</option>
-              <option value="Data Science">Data Science</option>
-              <option value="Academic Prep">Academic Prep</option>
-              <option value="Programming">Programming</option>
-              <option value="Career Planning">Career Planning</option>
+              <option value="JavaScript">JavaScript</option>
+              <option value="React">React</option>
+              <option value="Python">Python</option>
+              <option value="CSS">CSS</option>
+              <option value="Node.js">Node.js</option>
             </select>
             
             <select
@@ -318,7 +313,7 @@ const LearningJourneys = () => {
       {!loading && filteredJourneys.length === 0 && (
         <div className="text-center py-12">
           <MapIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-400 mb-2">No learning journeys found</h3>
+          <h3 className="text-xl font-semibold text-gray-400 mb-2">No journeys found</h3>
           <p className="text-gray-500">
             {searchTerm || selectedDifficulty || selectedSubject
               ? 'Try adjusting your filters to find more journeys'
@@ -327,36 +322,36 @@ const LearningJourneys = () => {
         </div>
       )}
 
-      {/* Featured Pathways Section */}
+      {/* Featured Journeys Section */}
       <div className="starguide-card">
-        <h2 className="text-2xl font-bold text-white mb-6">🗺️ Featured Pathways</h2>
+        <h2 className="text-2xl font-bold text-white mb-6">🌟 Featured Journeys</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
             {
-              title: 'Career Transition',
-              description: 'Switch careers with confidence',
-              participants: 89,
-              reward: '400 Points'
-            },
-            {
-              title: 'College Success',
-              description: 'Excel in higher education',
+              title: 'Weekly Challenge',
+              description: 'Algorithm mastery journey',
               participants: 156,
-              reward: '350 Points'
+              reward: '500 XP'
             },
             {
-              title: 'Skill Mastery',
-              description: 'Deep dive into expertise',
-              participants: 67,
-              reward: '500 Points'
+              title: 'Beginner Bootcamp',
+              description: 'Perfect for newcomers',
+              participants: 89,
+              reward: '200 XP'
+            },
+            {
+              title: 'Expert Arena',
+              description: 'Advanced concepts only',
+              participants: 23,
+              reward: '1000 XP'
             }
-          ].map((pathway, index) => (
+          ].map((journey, index) => (
             <div key={index} className="bg-gray-800 p-4 rounded-lg">
-              <h3 className="font-semibold text-white mb-2">{pathway.title}</h3>
-              <p className="text-gray-400 text-sm mb-3">{pathway.description}</p>
+              <h3 className="font-semibold text-white mb-2">{journey.title}</h3>
+              <p className="text-gray-400 text-sm mb-3">{journey.description}</p>
               <div className="flex justify-between items-center">
-                <span className="text-gray-500 text-sm">{pathway.participants} enrolled</span>
-                <span className="text-gray-400 font-medium">{pathway.reward}</span>
+                <span className="text-gray-500 text-sm">{journey.participants} joined</span>
+                <span className="text-blue-500 font-medium">{journey.reward}</span>
               </div>
             </div>
           ))}

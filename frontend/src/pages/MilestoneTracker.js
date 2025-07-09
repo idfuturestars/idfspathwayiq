@@ -2,201 +2,154 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import {
   TrophyIcon,
-  ChartBarIcon,
-  CalendarDaysIcon,
-  UsersIcon,
   StarIcon,
   FireIcon,
-  AcademicCapIcon,
-  BriefcaseIcon,
-  ClockIcon
+  ChartBarIcon,
+  UsersIcon,
+  ClockIcon,
+  BookOpenIcon
 } from '@heroicons/react/24/outline';
 
 const MilestoneTracker = () => {
   const { user } = useAuth();
-  const [milestones, setMilestones] = useState([]);
-  const [leaderboard, setLeaderboard] = useState([]);
-  const [selectedTimeframe, setSelectedTimeframe] = useState('all');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [activeTab, setActiveTab] = useState('overall');
+  const [timeframe, setTimeframe] = useState('week');
 
-  const mockMilestones = [
-    {
-      id: 1,
-      user_id: user?.id,
-      username: user?.username,
-      milestone_type: 'course_completion',
-      title: 'Web Development Fundamentals',
-      description: 'Completed comprehensive web development course',
-      points_earned: 250,
-      date_achieved: '2024-01-25',
-      category: 'academic',
-      difficulty: 'intermediate',
-      verification_status: 'verified'
-    },
-    {
-      id: 2,
-      user_id: user?.id,
-      username: user?.username,
-      milestone_type: 'skill_mastery',
-      title: 'JavaScript Proficiency',
-      description: 'Demonstrated advanced JavaScript skills',
-      points_earned: 200,
-      date_achieved: '2024-01-20',
-      category: 'technical',
-      difficulty: 'advanced',
-      verification_status: 'verified'
-    },
-    {
-      id: 3,
-      user_id: user?.id,
-      username: user?.username,
-      milestone_type: 'learning_streak',
-      title: '30-Day Learning Streak',
-      description: 'Maintained consistent daily learning for 30 days',
-      points_earned: 150,
-      date_achieved: '2024-01-15',
-      category: 'personal',
-      difficulty: 'beginner',
-      verification_status: 'verified'
-    }
-  ];
-
-  const mockLeaderboard = [
-    { rank: 1, username: 'Alex Chen', total_points: 2850, milestones_count: 15, avatar: '👨‍💻' },
-    { rank: 2, username: 'Sarah Johnson', total_points: 2640, milestones_count: 13, avatar: '👩‍🎓' },
-    { rank: 3, username: user?.username || 'You', total_points: 2400, milestones_count: 12, avatar: '🎯' },
-    { rank: 4, username: 'Miguel Rodriguez', total_points: 2200, milestones_count: 11, avatar: '🚀' },
-    { rank: 5, username: 'Emily Davis', total_points: 2050, milestones_count: 10, avatar: '⭐' },
-    { rank: 6, username: 'David Park', total_points: 1900, milestones_count: 9, avatar: '🎨' },
-    { rank: 7, username: 'Lisa Wang', total_points: 1750, milestones_count: 8, avatar: '📊' },
-    { rank: 8, username: 'James Wilson', total_points: 1600, milestones_count: 7, avatar: '💡' }
-  ];
-
-  useEffect(() => {
-    loadMilestones();
-    loadLeaderboard();
-  }, [selectedTimeframe, selectedCategory]);
-
-  const loadMilestones = async () => {
-    try {
-      // Use mock data for now
-      setMilestones(mockMilestones);
-    } catch (error) {
-      console.error('Failed to load milestones:', error);
-      setMilestones(mockMilestones);
+  // Mock leaderboard data
+  const leaderboards = {
+    overall: [
+      { id: 1, username: 'PathwayMaster2024', level: 15, xp: 12500, streak: 45, avatar: '👑' },
+      { id: 2, username: 'JSNavigator', level: 12, xp: 9800, streak: 23, avatar: '🥷' },
+      { id: 3, username: 'PythonPioneer', level: 11, xp: 8600, streak: 67, avatar: '🐍' },
+      { id: 4, username: 'ReactRanger', level: 10, xp: 7900, streak: 12, avatar: '👸' },
+      { id: 5, username: 'AlgoExplorer', level: 9, xp: 7200, streak: 34, avatar: '🧙' },
+      { id: 6, username: user?.username || 'You', level: user?.level || 3, xp: user?.xp || 1250, streak: user?.streak_days || 5, avatar: '⭐' },
+      { id: 7, username: 'CodeCrafter', level: 8, xp: 6100, streak: 18, avatar: '🎨' },
+      { id: 8, username: 'DataSage', level: 8, xp: 5900, streak: 9, avatar: '📊' },
+      { id: 9, username: 'WebWanderer', level: 7, xp: 5400, streak: 21, avatar: '💻' },
+      { id: 10, username: 'CloudClimber', level: 7, xp: 5100, streak: 15, avatar: '🔧' }
+    ],
+    weekly: [
+      { id: 1, username: 'WeeklyChamp', xp_gained: 850, questions: 45, time: 180 },
+      { id: 2, username: 'SpeedRunner', xp_gained: 720, questions: 38, time: 120 },
+      { id: 3, username: user?.username || 'You', xp_gained: 650, questions: 32, time: 150 },
+      { id: 4, username: 'StudyBot', xp_gained: 590, questions: 29, time: 200 },
+      { id: 5, username: 'QuizMaster', xp_gained: 540, questions: 27, time: 90 }
+    ],
+    subject: {
+      JavaScript: [
+        { id: 1, username: 'JSExpert', score: 98, questions: 120, accuracy: 96 },
+        { id: 2, username: 'CodeNinja', score: 95, questions: 89, accuracy: 94 },
+        { id: 3, username: user?.username || 'You', score: 87, questions: 67, accuracy: 89 }
+      ],
+      Python: [
+        { id: 1, username: 'SnakeMaster', score: 99, questions: 150, accuracy: 98 },
+        { id: 2, username: 'DataGuru', score: 93, questions: 78, accuracy: 91 }
+      ],
+      React: [
+        { id: 1, username: 'HookMaster', score: 96, questions: 85, accuracy: 95 },
+        { id: 2, username: 'ComponentKing', score: 91, questions: 65, accuracy: 88 }
+      ]
     }
   };
 
-  const loadLeaderboard = async () => {
-    try {
-      // Use mock data for now
-      setLeaderboard(mockLeaderboard);
-    } catch (error) {
-      console.error('Failed to load leaderboard:', error);
-      setLeaderboard(mockLeaderboard);
+  const getRankIcon = (rank) => {
+    switch (rank) {
+      case 1: return '🥇';
+      case 2: return '🥈';
+      case 3: return '🥉';
+      default: return `#${rank}`;
     }
   };
 
-  const getCategoryIcon = (category) => {
-    switch (category) {
-      case 'academic': return AcademicCapIcon;
-      case 'technical': return BriefcaseIcon;
-      case 'personal': return StarIcon;
-      default: return TrophyIcon;
+  const getRankColor = (rank) => {
+    switch (rank) {
+      case 1: return 'text-yellow-400';
+      case 2: return 'text-gray-300';
+      case 3: return 'text-amber-600';
+      default: return 'text-gray-400';
     }
   };
 
-  const getDifficultyColor = (difficulty) => {
-    switch (difficulty) {
-      case 'beginner': return 'bg-gray-600';
-      case 'intermediate': return 'bg-gray-500';
-      case 'advanced': return 'bg-gray-400';
-      default: return 'bg-gray-600';
-    }
-  };
-
-  const MilestoneCard = ({ milestone }) => {
-    const CategoryIcon = getCategoryIcon(milestone.category);
+  const LeaderboardCard = ({ entry, rank, type = 'overall' }) => {
+    const isCurrentUser = entry.username === user?.username || entry.username === 'You';
     
     return (
-      <div className="starguide-card hover:border-gray-500 transition-all duration-300">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center mb-2">
-            <CategoryIcon className="w-6 h-6 text-gray-400 mr-3" />
-            <div>
-              <h3 className="text-lg font-semibold text-white">{milestone.title}</h3>
-              <p className="text-gray-400 text-sm">{milestone.description}</p>
+      <div className={`p-4 rounded-lg border transition-all ${
+        isCurrentUser 
+          ? 'bg-blue-500/10 border-blue-500/30' 
+          : 'bg-gray-800 border-gray-700 hover:border-gray-600'
+      }`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className={`text-2xl font-bold ${getRankColor(rank)} min-w-[3rem] text-center`}>
+              {getRankIcon(rank)}
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-2xl">
+                {entry.avatar || entry.username.charAt(0).toUpperCase()}
+              </div>
+              
+              <div>
+                <h3 className={`font-semibold ${isCurrentUser ? 'text-blue-400' : 'text-white'}`}>
+                  {entry.username}
+                  {isCurrentUser && <span className="ml-2 text-xs bg-blue-500 px-2 py-1 rounded">YOU</span>}
+                </h3>
+                
+                {type === 'overall' && (
+                  <div className="flex items-center space-x-3 text-sm text-gray-400">
+                    <span>Level {entry.level}</span>
+                    <span className="flex items-center">
+                      <FireIcon className="w-4 h-4 mr-1 text-orange-500" />
+                      {entry.streak} days
+                    </span>
+                  </div>
+                )}
+                
+                {type === 'weekly' && (
+                  <div className="flex items-center space-x-3 text-sm text-gray-400">
+                    <span>{entry.questions} questions</span>
+                    <span>{entry.time} min</span>
+                  </div>
+                )}
+                
+                {type === 'subject' && (
+                  <div className="flex items-center space-x-3 text-sm text-gray-400">
+                    <span>{entry.accuracy}% accuracy</span>
+                    <span>{entry.questions} questions</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           
           <div className="text-right">
-            <div className="text-gray-300 font-bold text-lg">+{milestone.points_earned}</div>
-            <div className="text-gray-400 text-sm">Points</div>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <span className={`badge ${getDifficultyColor(milestone.difficulty)}`}>
-              {milestone.difficulty}
-            </span>
-            <span className="badge bg-gray-700 text-gray-300">{milestone.category}</span>
-            {milestone.verification_status === 'verified' && (
-              <span className="text-gray-400 text-sm flex items-center">
-                <StarIcon className="w-4 h-4 mr-1" />
-                Verified
-              </span>
+            {type === 'overall' && (
+              <div>
+                <p className="text-xl font-bold text-blue-500">{entry.xp.toLocaleString()}</p>
+                <p className="text-gray-400 text-sm">XP</p>
+              </div>
             )}
-          </div>
-          
-          <div className="text-gray-400 text-sm flex items-center">
-            <CalendarDaysIcon className="w-4 h-4 mr-1" />
-            {new Date(milestone.date_achieved).toLocaleDateString()}
+            
+            {type === 'weekly' && (
+              <div>
+                <p className="text-xl font-bold text-green-500">+{entry.xp_gained}</p>
+                <p className="text-gray-400 text-sm">XP this week</p>
+              </div>
+            )}
+            
+            {type === 'subject' && (
+              <div>
+                <p className="text-xl font-bold text-purple-500">{entry.score}%</p>
+                <p className="text-gray-400 text-sm">Score</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
     );
   };
-
-  const LeaderboardCard = ({ entry }) => (
-    <div className={`flex items-center p-4 rounded-lg transition-all duration-300 ${
-      entry.username === user?.username 
-        ? 'bg-gray-700 border border-gray-600' 
-        : 'bg-gray-800 hover:bg-gray-750'
-    }`}>
-      <div className="flex items-center flex-1">
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 ${
-          entry.rank <= 3 ? 'bg-gradient-to-r from-gray-400 to-gray-500' : 'bg-gray-700'
-        }`}>
-          <span className="text-lg">{entry.rank <= 3 ? ['🥇', '🥈', '🥉'][entry.rank - 1] : entry.rank}</span>
-        </div>
-        
-        <div className="text-2xl mr-3">{entry.avatar}</div>
-        
-        <div className="flex-1">
-          <div className="flex items-center">
-            <span className={`font-semibold ${
-              entry.username === user?.username ? 'text-white' : 'text-gray-300'
-            }`}>
-              {entry.username}
-            </span>
-            {entry.username === user?.username && (
-              <span className="ml-2 text-xs bg-gray-600 text-gray-300 px-2 py-1 rounded">You</span>
-            )}
-          </div>
-          <div className="text-gray-400 text-sm">{entry.milestones_count} milestones</div>
-        </div>
-      </div>
-      
-      <div className="text-right">
-        <div className="text-gray-300 font-bold">{entry.total_points.toLocaleString()}</div>
-        <div className="text-gray-400 text-sm">points</div>
-      </div>
-    </div>
-  );
-
-  const totalPoints = milestones.reduce((sum, milestone) => sum + milestone.points_earned, 0);
-  const userRank = leaderboard.findIndex(entry => entry.username === user?.username) + 1;
 
   return (
     <div className="space-y-6">
@@ -204,165 +157,196 @@ const MilestoneTracker = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
-            <TrophyIcon className="w-8 h-8 text-gray-400 mr-3" />
+            <TrophyIcon className="w-8 h-8 text-yellow-500 mr-3" />
             Milestone Tracker
           </h1>
-          <p className="text-gray-400">Track your learning achievements and compare with peers</p>
-        </div>
-        
-        <div className="text-right">
-          <div className="text-2xl font-bold text-white">{totalPoints}</div>
-          <div className="text-gray-400 text-sm">Total Points</div>
+          <p className="text-gray-400">Track your progress against other pathway navigators</p>
         </div>
       </div>
 
-      {/* User Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="starguide-card text-center">
-          <TrophyIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-          <h3 className="text-xl font-bold text-white mb-1">{milestones.length}</h3>
-          <p className="text-gray-400 text-sm">Milestones Achieved</p>
-        </div>
-        
-        <div className="starguide-card text-center">
-          <ChartBarIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-          <h3 className="text-xl font-bold text-white mb-1">#{userRank}</h3>
-          <p className="text-gray-400 text-sm">Current Rank</p>
-        </div>
-        
-        <div className="starguide-card text-center">
-          <StarIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-          <h3 className="text-xl font-bold text-white mb-1">{totalPoints}</h3>
-          <p className="text-gray-400 text-sm">Total Points</p>
-        </div>
-        
-        <div className="starguide-card text-center">
-          <FireIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-          <h3 className="text-xl font-bold text-white mb-1">{user?.streak_days || 5}</h3>
-          <p className="text-gray-400 text-sm">Day Streak</p>
+      {/* Your Stats */}
+      <div className="starguide-card">
+        <h2 className="text-2xl font-semibold text-white mb-6">Your Progress</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="text-center">
+            <StarIcon className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-white">{user?.level || 3}</p>
+            <p className="text-gray-400 text-sm">Level</p>
+          </div>
+          <div className="text-center">
+            <TrophyIcon className="w-8 h-8 text-blue-500 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-white">{user?.xp || 0}</p>
+            <p className="text-gray-400 text-sm">Total XP</p>
+          </div>
+          <div className="text-center">
+            <FireIcon className="w-8 h-8 text-orange-500 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-white">{user?.streak_days || 0}</p>
+            <p className="text-gray-400 text-sm">Day Streak</p>
+          </div>
+          <div className="text-center">
+            <UsersIcon className="w-8 h-8 text-purple-500 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-white">3</p>
+            <p className="text-gray-400 text-sm">Learning Circles</p>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Milestones Section */}
-        <div className="lg:col-span-2">
+      {/* Tabs */}
+      <div className="flex space-x-1 bg-gray-800 rounded-lg p-1">
+        {[
+          { id: 'overall', label: 'Overall Rankings', icon: TrophyIcon },
+          { id: 'weekly', label: 'Weekly Leaders', icon: ChartBarIcon },
+          { id: 'subject', label: 'Subject Masters', icon: BookOpenIcon },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors flex items-center justify-center ${
+              activeTab === tab.id
+                ? 'bg-blue-500 text-white'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <tab.icon className="w-4 h-4 mr-2" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Overall Rankings */}
+      {activeTab === 'overall' && (
+        <div className="starguide-card">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">Your Milestones</h2>
-            
-            <div className="flex gap-4">
-              <select
-                value={selectedTimeframe}
-                onChange={(e) => setSelectedTimeframe(e.target.value)}
-                className="form-input"
-              >
-                <option value="all">All Time</option>
-                <option value="month">This Month</option>
-                <option value="week">This Week</option>
-              </select>
-              
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="form-input"
-              >
-                <option value="all">All Categories</option>
-                <option value="academic">Academic</option>
-                <option value="technical">Technical</option>
-                <option value="personal">Personal</option>
-              </select>
-            </div>
+            <h2 className="text-2xl font-semibold text-white">Overall Rankings</h2>
+            <span className="text-gray-400 text-sm">Based on total XP earned</span>
           </div>
-
-          <div className="space-y-4">
-            {milestones.length > 0 ? (
-              milestones.map((milestone) => (
-                <MilestoneCard key={milestone.id} milestone={milestone} />
-              ))
-            ) : (
-              <div className="text-center py-12">
-                <TrophyIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-400 mb-2">No milestones yet</h3>
-                <p className="text-gray-500">Start learning to earn your first milestone!</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Leaderboard Section */}
-        <div>
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
-            <ChartBarIcon className="w-6 h-6 text-gray-400 mr-2" />
-            Leaderboard
-          </h2>
           
           <div className="space-y-3">
-            {leaderboard.map((entry, index) => (
-              <LeaderboardCard key={index} entry={entry} />
+            {leaderboards.overall.map((entry, index) => (
+              <LeaderboardCard key={entry.id} entry={entry} rank={index + 1} type="overall" />
             ))}
           </div>
-          
-          <div className="mt-6 starguide-card text-center">
-            <div className="text-gray-400 text-sm mb-2">Your Progress</div>
-            <div className="text-white font-semibold">Rank #{userRank} of {leaderboard.length}</div>
-            <div className="text-gray-400 text-sm mt-1">
-              {userRank > 1 && leaderboard[userRank - 2] && (
-                <>
-                  {leaderboard[userRank - 2].total_points - (leaderboard.find(e => e.username === user?.username)?.total_points || 0)} points to next rank
-                </>
-              )}
-            </div>
+        </div>
+      )}
+
+      {/* Weekly Leaders */}
+      {activeTab === 'weekly' && (
+        <div className="starguide-card">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold text-white">Weekly Leaders</h2>
+            <span className="text-gray-400 text-sm">XP gained this week</span>
           </div>
+          
+          <div className="space-y-3">
+            {leaderboards.weekly.map((entry, index) => (
+              <LeaderboardCard key={entry.id} entry={entry} rank={index + 1} type="weekly" />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Subject Masters */}
+      {activeTab === 'subject' && (
+        <div className="space-y-6">
+          {Object.entries(leaderboards.subject).map(([subject, entries]) => (
+            <div key={subject} className="starguide-card">
+              <h2 className="text-2xl font-semibold text-white mb-4">{subject} Masters</h2>
+              <div className="space-y-3">
+                {entries.map((entry, index) => (
+                  <LeaderboardCard key={entry.id} entry={entry} rank={index + 1} type="subject" />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Competition Calendar */}
+      <div className="starguide-card">
+        <h2 className="text-2xl font-semibold text-white mb-6 flex items-center">
+          <ClockIcon className="w-6 h-6 text-green-500 mr-2" />
+          Upcoming Challenges
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[
+            {
+              title: 'Weekly JavaScript Challenge',
+              description: 'Test your JS skills in a timed competition',
+              date: 'Starts in 2 days',
+              prize: '500 XP + Achievement',
+              participants: 124
+            },
+            {
+              title: 'Python Algorithm Sprint',
+              description: 'Solve complex algorithms under pressure',
+              date: 'Starts in 5 days',
+              prize: '1000 XP + Achievement',
+              participants: 89
+            },
+            {
+              title: 'React Component Battle',
+              description: 'Build the best React components',
+              date: 'Starts in 1 week',
+              prize: '750 XP + Achievement',
+              participants: 67
+            }
+          ].map((competition, index) => (
+            <div key={index} className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+              <h3 className="text-white font-semibold mb-2">{competition.title}</h3>
+              <p className="text-gray-400 text-sm mb-3">{competition.description}</p>
+              
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Starts:</span>
+                  <span className="text-white">{competition.date}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Prize:</span>
+                  <span className="text-green-500">{competition.prize}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Registered:</span>
+                  <span className="text-blue-500">{competition.participants}</span>
+                </div>
+              </div>
+              
+              <button className="w-full mt-4 btn-primary text-sm">
+                Register Now
+              </button>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Milestone Categories */}
+      {/* Hall of Fame */}
       <div className="starguide-card">
-        <h2 className="text-2xl font-bold text-white mb-6">Milestone Categories</h2>
+        <h2 className="text-2xl font-semibold text-white mb-6">🏆 Hall of Fame</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              category: 'Academic',
-              icon: AcademicCapIcon,
-              count: milestones.filter(m => m.category === 'academic').length,
-              points: milestones.filter(m => m.category === 'academic').reduce((sum, m) => sum + m.points_earned, 0),
-              description: 'Course completions, certifications, academic achievements'
-            },
-            {
-              category: 'Technical',
-              icon: BriefcaseIcon,
-              count: milestones.filter(m => m.category === 'technical').length,
-              points: milestones.filter(m => m.category === 'technical').reduce((sum, m) => sum + m.points_earned, 0),
-              description: 'Skill mastery, project completions, technical proficiency'
-            },
-            {
-              category: 'Personal',
-              icon: StarIcon,
-              count: milestones.filter(m => m.category === 'personal').length,
-              points: milestones.filter(m => m.category === 'personal').reduce((sum, m) => sum + m.points_earned, 0),
-              description: 'Learning streaks, personal development, consistency'
-            }
-          ].map((cat, index) => (
-            <div key={index} className="bg-gray-800 p-6 rounded-lg">
-              <div className="flex items-center mb-4">
-                <cat.icon className="w-8 h-8 text-gray-400 mr-3" />
-                <h3 className="text-lg font-semibold text-white">{cat.category}</h3>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 mb-3">
-                <div>
-                  <div className="text-xl font-bold text-white">{cat.count}</div>
-                  <div className="text-gray-400 text-sm">Milestones</div>
-                </div>
-                <div>
-                  <div className="text-xl font-bold text-white">{cat.points}</div>
-                  <div className="text-gray-400 text-sm">Points</div>
-                </div>
-              </div>
-              
-              <p className="text-gray-400 text-sm">{cat.description}</p>
-            </div>
-          ))}
+          <div className="text-center p-6 bg-gradient-to-b from-yellow-500/20 to-transparent rounded-lg border border-yellow-500/30">
+            <div className="text-6xl mb-4">👑</div>
+            <h3 className="text-xl font-bold text-yellow-400 mb-2">PathwayMaster2024</h3>
+            <p className="text-gray-400 mb-2">Current Champion</p>
+            <p className="text-2xl font-bold text-white">12,500 XP</p>
+            <p className="text-yellow-500 text-sm mt-2">45-day streak</p>
+          </div>
+          
+          <div className="text-center p-6 bg-gradient-to-b from-purple-500/20 to-transparent rounded-lg border border-purple-500/30">
+            <div className="text-6xl mb-4">🚀</div>
+            <h3 className="text-xl font-bold text-purple-400 mb-2">Most Improved</h3>
+            <p className="text-gray-400 mb-2">SpeedLearner99</p>
+            <p className="text-2xl font-bold text-white">+2,500 XP</p>
+            <p className="text-purple-500 text-sm mt-2">This month</p>
+          </div>
+          
+          <div className="text-center p-6 bg-gradient-to-b from-green-500/20 to-transparent rounded-lg border border-green-500/30">
+            <div className="text-6xl mb-4">🔥</div>
+            <h3 className="text-xl font-bold text-green-400 mb-2">Longest Streak</h3>
+            <p className="text-gray-400 mb-2">PythonPioneer</p>
+            <p className="text-2xl font-bold text-white">67 Days</p>
+            <p className="text-green-500 text-sm mt-2">Still going!</p>
+          </div>
         </div>
       </div>
     </div>
