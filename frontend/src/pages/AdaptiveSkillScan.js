@@ -263,7 +263,7 @@ const AdaptiveSkillScan = () => {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-4 flex items-center justify-center">
-            <CompassIcon className="w-8 h-8 text-gray-400 mr-3" />
+            <MapIcon className="w-8 h-8 text-gray-400 mr-3" />
             Talent Compass™
           </h1>
           <p className="text-gray-400 text-lg">
