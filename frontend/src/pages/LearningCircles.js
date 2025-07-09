@@ -225,10 +225,10 @@ const LearningCircles = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
-            <UserGroupIcon className="w-8 h-8 text-gray-400 mr-3" />
+            <UserGroupIcon className="w-8 h-8 text-purple-500 mr-3" />
             Learning Circles
           </h1>
-          <p className="text-gray-400">Collaborative study groups for peer learning and support</p>
+          <p className="text-gray-400">Collaborate and learn together in supportive communities</p>
         </div>
         
         <button
