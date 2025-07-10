@@ -13,7 +13,6 @@ import logging
 from typing import Any, Optional, Union, Dict, List
 from datetime import datetime, timedelta
 import redis
-import aioredis
 from functools import wraps
 import structlog
 
@@ -26,7 +25,6 @@ class AdvancedCacheManager:
     def __init__(self, redis_url: str = "redis://localhost:6379"):
         self.redis_url = redis_url
         self.redis_client = None
-        self.async_redis = None
         self.stats = {
             'hits': 0,
             'misses': 0,
@@ -48,16 +46,6 @@ class AdvancedCacheManager:
                 health_check_interval=30
             )
             
-            # Asynchronous Redis client
-            self.async_redis = await aioredis.from_url(
-                self.redis_url,
-                decode_responses=True,
-                retry_on_timeout=True,
-                socket_connect_timeout=5,
-                socket_timeout=5,
-                health_check_interval=30
-            )
-            
             # Test connections
             await self.health_check()
             logger.info("✅ Advanced Redis Cache Manager initialized")
@@ -71,10 +59,6 @@ class AdvancedCacheManager:
         try:
             # Test sync client
             self.redis_client.ping()
-            
-            # Test async client
-            await self.async_redis.ping()
-            
             return True
         except Exception as e:
             logger.error(f"Redis health check failed: {e}")
@@ -91,13 +75,10 @@ class AdvancedCacheManager:
             
         return ":".join(key_parts)
     
-    async def get(self, key: str, use_async: bool = True) -> Optional[Any]:
-        """Get value from cache with fallback"""
+    async def get(self, key: str) -> Optional[Any]:
+        """Get value from cache"""
         try:
-            if use_async and self.async_redis:
-                value = await self.async_redis.get(key)
-            else:
-                value = self.redis_client.get(key)
+            value = self.redis_client.get(key)
                 
             if value is not None:
                 self.stats['hits'] += 1
@@ -118,8 +99,7 @@ class AdvancedCacheManager:
     async def set(self, 
                   key: str, 
                   value: Any, 
-                  expire: int = 3600,
-                  use_async: bool = True) -> bool:
+                  expire: int = 3600) -> bool:
         """Set value in cache with expiration"""
         try:
             # Serialize value
@@ -128,10 +108,7 @@ class AdvancedCacheManager:
             except (TypeError, ValueError):
                 serialized = pickle.dumps(value).decode('latin1')
             
-            if use_async and self.async_redis:
-                await self.async_redis.setex(key, expire, serialized)
-            else:
-                self.redis_client.setex(key, expire, serialized)
+            self.redis_client.setex(key, expire, serialized)
                 
             self.stats['sets'] += 1
             return True
@@ -141,14 +118,10 @@ class AdvancedCacheManager:
             logger.error(f"Cache set error for key {key}: {e}")
             return False
     
-    async def delete(self, key: str, use_async: bool = True) -> bool:
+    async def delete(self, key: str) -> bool:
         """Delete key from cache"""
         try:
-            if use_async and self.async_redis:
-                await self.async_redis.delete(key)
-            else:
-                self.redis_client.delete(key)
-                
+            self.redis_client.delete(key)
             self.stats['deletes'] += 1
             return True
             
@@ -160,9 +133,9 @@ class AdvancedCacheManager:
     async def invalidate_pattern(self, pattern: str) -> int:
         """Invalidate all keys matching pattern"""
         try:
-            keys = await self.async_redis.keys(pattern)
+            keys = self.redis_client.keys(pattern)
             if keys:
-                await self.async_redis.delete(*keys)
+                self.redis_client.delete(*keys)
                 self.stats['deletes'] += len(keys)
                 return len(keys)
             return 0
@@ -238,8 +211,6 @@ class AdvancedCacheManager:
     async def close(self):
         """Close Redis connections"""
         try:
-            if self.async_redis:
-                await self.async_redis.close()
             if self.redis_client:
                 self.redis_client.close()
             logger.info("✅ Redis connections closed")
