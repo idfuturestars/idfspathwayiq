@@ -88,10 +88,33 @@ class EnhancedEmotionalIntelligence:
         self.intervention_strategies = {}
         self.emotional_history = {}
         
-        # Initialize AI clients
-        self.openai_client = openai.OpenAI()
-        self.claude_client = anthropic.Anthropic()
-        genai.configure(api_key=os.environ.get('GEMINI_API_KEY'))
+        # Initialize AI clients with proper error handling
+        try:
+            openai_key = os.environ.get('OPENAI_API_KEY')
+            claude_key = os.environ.get('CLAUDE_API_KEY')
+            gemini_key = os.environ.get('GEMINI_API_KEY')
+            
+            if openai_key:
+                self.openai_client = openai.OpenAI(api_key=openai_key)
+            else:
+                logger.warning("OPENAI_API_KEY not found, OpenAI features will be disabled")
+                self.openai_client = None
+                
+            if claude_key:
+                self.claude_client = anthropic.Anthropic(api_key=claude_key)
+            else:
+                logger.warning("CLAUDE_API_KEY not found, Claude features will be disabled")
+                self.claude_client = None
+                
+            if gemini_key:
+                genai.configure(api_key=gemini_key)
+            else:
+                logger.warning("GEMINI_API_KEY not found, Gemini features will be disabled")
+                
+        except Exception as e:
+            logger.error(f"Failed to initialize AI clients: {e}")
+            self.openai_client = None
+            self.claude_client = None
         
     async def analyze_emotional_state(self, 
                                     user_id: str,
