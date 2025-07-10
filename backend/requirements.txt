@@ -45,7 +45,6 @@ torch>=2.0.0
 hiredis>=3.0.0
 # Phase 2.1: Performance Monitoring
 psutil>=6.0.0
-aioredis>=2.0.1
 # Phase 2.1: Data Governance
 pydantic-settings>=2.0.0
 # Phase 2.1: Security Hardening
