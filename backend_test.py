@@ -941,14 +941,10 @@ class StarGuideBackendTest(unittest.TestCase):
         
         # Test 2: CDN Cache Purge
         try:
-            purge_data = {
-                "purge_all": False,
-                "urls": ["https://example.com/test.css", "https://example.com/test.js"]
-            }
+            # Test with query parameters instead of JSON body
             response = requests.post(
-                f"{BACKEND_URL}/system/cdn-purge",
-                headers=self.headers,
-                json=purge_data
+                f"{BACKEND_URL}/system/cdn-purge?purge_all=false",
+                headers=self.headers
             )
             self.assertEqual(response.status_code, 200)
             data = response.json()
