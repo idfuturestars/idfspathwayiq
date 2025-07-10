@@ -949,13 +949,14 @@ class StarGuideBackendTest(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             data = response.json()
             self.assertIn("status", data)
-            self.assertIn("timestamp", data)
             # CDN might not be configured, so we accept both success and not_configured
             self.assertIn(data["status"], ["success", "not_configured"])
             if data["status"] == "success":
                 self.assertIn("purge_result", data)
+                self.assertIn("timestamp", data)
                 print("✅ CDN cache purge endpoint working (CDN configured)")
             else:
+                self.assertIn("message", data)
                 print("✅ CDN cache purge endpoint working (CDN not configured)")
         except AssertionError as e:
             print(f"❌ CDN cache purge failed: {e}")
