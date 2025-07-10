@@ -63,6 +63,18 @@ from mlops_manager import (
     model_manager, experiment_tracker, model_monitor
 )
 
+# Phase 2.3: AI/ML Enhancement Components
+from personalization_engine import (
+    personalization_engine, LearnerProfile, LearningStyleType, PersonalityType
+)
+from enhanced_ai_features import (
+    enhanced_emotional_intelligence, advanced_voice_to_text, EmotionalState,
+    VoiceToTextResult, ThinkAloudAnalysis
+)
+from learning_path_engine import (
+    learning_path_engine, LearningGoal, LearningGoalType, PathwayType
+)
+
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
