@@ -2238,6 +2238,210 @@ async def generate_diagnostic_report(current_user: dict = Depends(get_current_us
         raise HTTPException(status_code=500, detail=f"Diagnostic report failed: {str(e)}")
 
 # ============================================================================
+# PHASE 2.2: TECHNICAL INFRASTRUCTURE ENDPOINTS
+# ============================================================================
+
+@api_router.get("/system/cdn-status")
+async def get_cdn_status(current_user: dict = Depends(get_current_user)):
+    """Get CDN status and analytics"""
+    try:
+        if 'cdn_manager' in globals() and cdn_manager:
+            cdn_status = cdn_manager.get_cdn_status()
+            analytics = await cdn_manager.get_analytics(days=7)
+            
+            return {
+                "status": "success",
+                "cdn_status": cdn_status,
+                "analytics": analytics,
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+        else:
+            return {
+                "status": "not_configured",
+                "message": "CDN not configured",
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+    except Exception as e:
+        logger.error(f"CDN status failed: {e}")
+        raise HTTPException(status_code=500, detail=f"CDN status failed: {str(e)}")
+
+@api_router.post("/system/cdn-purge")
+async def purge_cdn_cache(
+    purge_all: bool = False,
+    urls: Optional[List[str]] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Purge CDN cache"""
+    try:
+        if 'cdn_manager' in globals() and cdn_manager:
+            result = await cdn_manager.purge_cache(urls=urls, purge_all=purge_all)
+            
+            return {
+                "status": "success",
+                "purge_result": result,
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+        else:
+            return {
+                "status": "not_configured",
+                "message": "CDN not configured"
+            }
+    except Exception as e:
+        logger.error(f"CDN purge failed: {e}")
+        raise HTTPException(status_code=500, detail=f"CDN purge failed: {str(e)}")
+
+@api_router.get("/analytics/platform")
+async def get_platform_analytics(
+    days: int = 7,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get platform-wide analytics"""
+    try:
+        if 'analytics_manager' in globals() and analytics_manager:
+            analytics = await analytics_manager.get_platform_analytics(days=days)
+            
+            return {
+                "status": "success",
+                "analytics": analytics,
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+        else:
+            return {
+                "status": "not_configured",
+                "message": "Analytics not configured"
+            }
+    except Exception as e:
+        logger.error(f"Platform analytics failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Platform analytics failed: {str(e)}")
+
+@api_router.get("/analytics/user/{user_id}")
+async def get_user_analytics(
+    user_id: str,
+    days: int = 7,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get analytics for specific user"""
+    try:
+        if 'analytics_manager' in globals() and analytics_manager:
+            analytics = await analytics_manager.get_user_analytics(user_id, days=days)
+            
+            return {
+                "status": "success",
+                "analytics": analytics,
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+        else:
+            return {
+                "status": "not_configured",
+                "message": "Analytics not configured"
+            }
+    except Exception as e:
+        logger.error(f"User analytics failed: {e}")
+        raise HTTPException(status_code=500, detail=f"User analytics failed: {str(e)}")
+
+@api_router.get("/analytics/real-time")
+async def get_real_time_analytics(current_user: dict = Depends(get_current_user)):
+    """Get real-time analytics metrics"""
+    try:
+        if 'analytics_manager' in globals() and analytics_manager:
+            metrics = await analytics_manager.get_real_time_metrics()
+            
+            return {
+                "status": "success",
+                "metrics": metrics,
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+        else:
+            return {
+                "status": "not_configured",
+                "message": "Analytics not configured"
+            }
+    except Exception as e:
+        logger.error(f"Real-time analytics failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Real-time analytics failed: {str(e)}")
+
+@api_router.get("/mlops/models")
+async def list_ml_models(
+    model_type: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """List all ML models"""
+    try:
+        from mlops_manager import ModelType
+        
+        filter_type = None
+        if model_type:
+            try:
+                filter_type = ModelType(model_type)
+            except ValueError:
+                raise HTTPException(status_code=400, detail=f"Invalid model type: {model_type}")
+        
+        models = await model_manager.list_models(model_type=filter_type)
+        
+        return {
+            "status": "success",
+            "models": models,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"List models failed: {e}")
+        raise HTTPException(status_code=500, detail=f"List models failed: {str(e)}")
+
+@api_router.get("/mlops/models/{model_id}/performance")
+async def get_model_performance(
+    model_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get model performance metrics"""
+    try:
+        performance = await model_manager.get_model_performance(model_id)
+        
+        return {
+            "status": "success",
+            "performance": performance,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Model performance failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Model performance failed: {str(e)}")
+
+@api_router.get("/mlops/experiments")
+async def list_experiments(current_user: dict = Depends(get_current_user)):
+    """List ML experiments"""
+    try:
+        experiments = []
+        for exp_id in experiment_tracker.experiments.keys():
+            exp_result = await experiment_tracker.get_experiment_results(exp_id)
+            experiments.append(exp_result)
+        
+        return {
+            "status": "success",
+            "experiments": experiments,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"List experiments failed: {e}")
+        raise HTTPException(status_code=500, detail=f"List experiments failed: {str(e)}")
+
+@api_router.get("/mlops/monitoring/{model_id}")
+async def get_model_monitoring(
+    model_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get model monitoring status"""
+    try:
+        monitoring_status = await model_monitor.get_monitoring_status(model_id)
+        
+        return {
+            "status": "success",
+            "monitoring": monitoring_status,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Model monitoring failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Model monitoring failed: {str(e)}")
+
+# ============================================================================
 # PHASE 1: ADVANCED AI CAPABILITIES ENDPOINTS
 # ============================================================================
 
