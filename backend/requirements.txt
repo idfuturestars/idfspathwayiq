@@ -56,5 +56,7 @@ mixpanel>=4.10.0
 transformers>=4.36.0
 sentence-transformers>=2.2.2
 langchain>=0.1.0
+google-generativeai>=0.3.0
+networkx>=3.0
 # Phase 2.4: Push Notifications
 firebase-admin>=6.4.0
