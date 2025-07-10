@@ -41,6 +41,19 @@ from ai_engine import (
     advanced_ai_engine
 )
 
+# Phase 2.1: Advanced Infrastructure Components
+from cache_manager import cache_manager, performance_monitor as cache_performance_monitor
+from security_manager import (
+    create_security_middleware, password_hasher, encryption_manager,
+    DataSanitizer, AdvancedRateLimiter, SecureTokenManager
+)
+from performance_monitor import (
+    performance_monitor, application_profiler, diagnostic_tools
+)
+from data_governance import (
+    data_governance, initialize_default_schemas, DataProcessingPurpose
+)
+
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
