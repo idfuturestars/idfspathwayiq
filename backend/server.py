@@ -2099,6 +2099,108 @@ async def startup_event():
     logger.info("🎉 PathwayIQ API startup complete with all Phase 2.1 enhancements!")
 
 # ============================================================================
+# PHASE 2.1: ADVANCED INFRASTRUCTURE ENDPOINTS
+# ============================================================================
+
+@api_router.get("/system/health-advanced")
+async def advanced_health_check(current_user: dict = Depends(get_current_user)):
+    """Advanced health check with detailed diagnostics"""
+    try:
+        health_report = await diagnostic_tools.run_health_check()
+        return {
+            "status": "success",
+            "health_report": health_report,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Advanced health check failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Health check failed: {str(e)}")
+
+@api_router.get("/system/performance-metrics")
+async def get_performance_metrics(current_user: dict = Depends(get_current_user)):
+    """Get detailed performance metrics"""
+    try:
+        performance_summary = performance_monitor.get_performance_summary()
+        profiler_report = application_profiler.get_performance_report()
+        cache_stats = cache_manager.get_stats()
+        
+        return {
+            "status": "success",
+            "performance": performance_summary,
+            "profiler": profiler_report,
+            "cache": cache_stats,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Performance metrics failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Performance metrics failed: {str(e)}")
+
+@api_router.get("/system/security-status")
+async def get_security_status(current_user: dict = Depends(get_current_user)):
+    """Get security monitoring status"""
+    try:
+        if not hasattr(security_middleware, 'security_auditor'):
+            return {"status": "Security monitoring not available"}
+            
+        security_metrics = security_middleware['security_auditor'].get_security_metrics()
+        
+        return {
+            "status": "success",
+            "security_metrics": security_metrics,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Security status check failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Security status failed: {str(e)}")
+
+@api_router.get("/system/data-governance")
+async def get_data_governance_status(current_user: dict = Depends(get_current_user)):
+    """Get data governance framework status"""
+    try:
+        governance_status = data_governance.get_governance_status()
+        
+        return {
+            "status": "success",
+            "governance": governance_status,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Data governance status failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Data governance failed: {str(e)}")
+
+@api_router.get("/system/cache-analytics")
+async def get_cache_analytics(current_user: dict = Depends(get_current_user)):
+    """Get cache performance analytics"""
+    try:
+        cache_stats = cache_manager.get_stats()
+        performance_report = cache_performance_monitor.get_performance_report()
+        
+        return {
+            "status": "success",
+            "cache_stats": cache_stats,
+            "performance": performance_report,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Cache analytics failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Cache analytics failed: {str(e)}")
+
+@api_router.get("/system/diagnostic-report")
+async def generate_diagnostic_report(current_user: dict = Depends(get_current_user)):
+    """Generate comprehensive diagnostic report"""
+    try:
+        diagnostic_report = diagnostic_tools.generate_diagnostic_report()
+        
+        return {
+            "status": "success",
+            "diagnostic_report": diagnostic_report,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Diagnostic report failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Diagnostic report failed: {str(e)}")
+
+# ============================================================================
 # PHASE 1: ADVANCED AI CAPABILITIES ENDPOINTS
 # ============================================================================
 
