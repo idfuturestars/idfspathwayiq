@@ -431,11 +431,16 @@ class AdvancedVoiceToText:
     
     def __init__(self):
         self.recognizer = sr.Recognizer()
-        self.microphone = sr.Microphone()
         
-        # Calibrate microphone for ambient noise
-        with self.microphone as source:
-            self.recognizer.adjust_for_ambient_noise(source)
+        # Initialize microphone with error handling
+        try:
+            self.microphone = sr.Microphone()
+            # Calibrate microphone for ambient noise
+            with self.microphone as source:
+                self.recognizer.adjust_for_ambient_noise(source)
+        except Exception as e:
+            logger.warning(f"Failed to initialize microphone: {e}. Voice features will be limited.")
+            self.microphone = None
     
     async def transcribe_audio_data(self, audio_data: bytes, file_format: str = "wav") -> VoiceToTextResult:
         """Transcribe audio data to text with advanced analysis"""
