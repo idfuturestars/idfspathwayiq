@@ -662,8 +662,22 @@ class AdvancedVoiceToText:
             learning_indicators=learning_indicators
         )
 
-# Global instances
-enhanced_emotional_intelligence = EnhancedEmotionalIntelligence()
-advanced_voice_to_text = AdvancedVoiceToText()
+# Global instances with error handling
+try:
+    enhanced_emotional_intelligence = EnhancedEmotionalIntelligence()
+    logger.info("✅ Enhanced Emotional Intelligence initialized")
+except Exception as e:
+    logger.error(f"Failed to initialize Enhanced Emotional Intelligence: {e}")
+    enhanced_emotional_intelligence = None
 
-logger.info("✅ Enhanced Emotional Intelligence & Voice-to-Text Systems initialized")
+try:
+    advanced_voice_to_text = AdvancedVoiceToText()
+    logger.info("✅ Advanced Voice-to-Text initialized")
+except Exception as e:
+    logger.error(f"Failed to initialize Advanced Voice-to-Text: {e}")
+    advanced_voice_to_text = None
+
+if enhanced_emotional_intelligence and advanced_voice_to_text:
+    logger.info("✅ Enhanced Emotional Intelligence & Voice-to-Text Systems initialized")
+else:
+    logger.warning("⚠️ Some Enhanced AI features are disabled due to initialization errors")
