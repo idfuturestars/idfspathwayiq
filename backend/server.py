@@ -2127,6 +2127,20 @@ async def startup_event():
         # MLOps components are already initialized as globals
         logger.info("✅ MLOps Framework initialized")
         
+        # Phase 2.3: Initialize AI/ML enhancement components
+        
+        # Personalization engine is already initialized as global
+        logger.info("✅ Advanced Personalization Engine initialized")
+        
+        # Enhanced emotional intelligence is already initialized as global
+        logger.info("✅ Enhanced Emotional Intelligence initialized")
+        
+        # Advanced voice-to-text is already initialized as global
+        logger.info("✅ Advanced Voice-to-Text initialized")
+        
+        # Learning path engine is already initialized as global
+        logger.info("✅ Advanced Learning Path Engine initialized")
+        
     except Exception as e:
         logger.error(f"❌ Failed to initialize Phase 2.1 components: {e}")
         # Continue startup even if some components fail
