@@ -19,6 +19,7 @@ from sklearn.cluster import KMeans
 import networkx as nx
 import openai
 import hashlib
+import os
 
 logger = structlog.get_logger()
 
