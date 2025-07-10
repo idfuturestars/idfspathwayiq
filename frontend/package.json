@@ -1,6 +1,6 @@
 {
-  "name": "starguide-frontend",
-  "version": "1.0.0",
+  "name": "pathwayiq-frontend",
+  "version": "2.2.0",
   "private": true,
   "dependencies": {
     "@heroicons/react": "^2.0.18",
@@ -20,7 +20,15 @@
     "react-scripts": "5.0.1",
     "react-syntax-highlighter": "^15.5.0",
     "socket.io-client": "^4.7.2",
-    "tailwind-merge": "^2.0.0"
+    "tailwind-merge": "^2.0.0",
+    "@tailwindcss/forms": "^0.5.9",
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@headlessui/react": "^2.0.0",
+    "react-responsive": "^10.0.0",
+    "react-intersection-observer": "^9.10.2",
+    "react-virtual": "^2.10.4",
+    "react-window": "^1.8.8",
+    "workbox-webpack-plugin": "^7.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
