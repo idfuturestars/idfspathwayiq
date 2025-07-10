@@ -54,6 +54,15 @@ from data_governance import (
     data_governance, initialize_default_schemas, DataProcessingPurpose
 )
 
+# Phase 2.2: Technical Infrastructure Components
+from cdn_manager import initialize_cdn_manager, CDNConfiguration, content_optimizer
+from analytics_manager import (
+    initialize_analytics_manager, AnalyticsConfiguration, AnalyticsEventBuilder
+)
+from mlops_manager import (
+    model_manager, experiment_tracker, model_monitor
+)
+
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
