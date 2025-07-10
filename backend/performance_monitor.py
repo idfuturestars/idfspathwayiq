@@ -17,7 +17,7 @@ import threading
 import structlog
 from prometheus_client import Counter, Histogram, Gauge, CollectorRegistry, generate_latest
 import redis
-import aioredis
+import redis.asyncio as aioredis
 
 logger = structlog.get_logger()
 
