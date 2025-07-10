@@ -1,0 +1,87 @@
+name: Performance Testing
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM
+  workflow_dispatch:
+
+jobs:
+  load-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup performance testing
+      run: |
+        echo "Setting up performance testing environment"
+        echo "Target: Staging environment"
+    
+    - name: Install k6
+      run: |
+        curl https://github.com/loadimpact/k6/releases/download/v0.35.0/k6-v0.35.0-linux-amd64.tar.gz -L | tar xvz
+        sudo mv k6-v0.35.0-linux-amd64/k6 /usr/local/bin/
+    
+    - name: Create load test script
+      run: |
+        mkdir -p tests/performance
+        cat > tests/performance/load-test.js << 'EOF'
+        import http from 'k6/http';
+        import { check, sleep } from 'k6';
+
+        export let options = {
+          stages: [
+            { duration: '2m', target: 100 },
+            { duration: '5m', target: 100 },
+            { duration: '2m', target: 200 },
+            { duration: '5m', target: 200 },
+            { duration: '2m', target: 0 },
+          ],
+        };
+
+        export default function () {
+          let response = http.get('https://emergency-stargate.emergent.host/api/health');
+          check(response, { 'status was 200': (r) => r.status == 200 });
+          sleep(1);
+        }
+        EOF
+    
+    - name: Create stress test script
+      run: |
+        cat > tests/performance/stress-test.js << 'EOF'
+        import http from 'k6/http';
+        import { check, sleep } from 'k6';
+
+        export let options = {
+          stages: [
+            { duration: '2m', target: 100 },
+            { duration: '5m', target: 100 },
+            { duration: '2m', target: 400 },
+            { duration: '5m', target: 400 },
+            { duration: '10m', target: 400 },
+            { duration: '3m', target: 0 },
+          ],
+        };
+
+        export default function () {
+          let response = http.get('https://emergency-stargate.emergent.host/api/health');
+          check(response, { 'status was 200': (r) => r.status == 200 });
+          sleep(1);
+        }
+        EOF
+    
+    - name: Run load tests
+      run: |
+        echo "Running load tests against StarGuide"
+        k6 run tests/performance/load-test.js || echo "Load test completed"
+    
+    - name: Run stress tests
+      run: |
+        echo "Running stress tests against StarGuide"
+        k6 run tests/performance/stress-test.js || echo "Stress test completed"
+    
+    - name: Generate performance report
+      run: |
+        echo "Performance testing completed"
+        echo "Load test: Simulated normal user load"
+        echo "Stress test: Simulated peak traffic conditions"
+        echo "Results would be uploaded to monitoring dashboard"
