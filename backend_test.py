@@ -930,6 +930,7 @@ if __name__ == "__main__":
     test_suite.addTest(StarGuideBackendTest('test_17_structured_logging'))
     test_suite.addTest(StarGuideBackendTest('test_18_security_middleware'))
     test_suite.addTest(StarGuideBackendTest('test_19_cors_handling'))
+    test_suite.addTest(StarGuideBackendTest('test_20_phase_2_1_advanced_infrastructure'))
     
     runner = unittest.TextTestRunner()
     runner.run(test_suite)
