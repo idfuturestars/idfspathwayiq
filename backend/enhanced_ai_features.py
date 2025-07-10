@@ -546,6 +546,23 @@ class AdvancedVoiceToText:
     async def analyze_think_aloud_protocol(self, transcribed_text: str) -> ThinkAloudAnalysis:
         """Analyze think-aloud protocol for cognitive insights"""
         try:
+            # Check if OpenAI client is available
+            if not self.openai_client:
+                logger.warning("OpenAI client not available, using fallback analysis")
+                return ThinkAloudAnalysis(
+                    reasoning_strategy="basic_analysis",
+                    cognitive_load=0.5,
+                    problem_solving_approach="analytical",
+                    misconceptions=[],
+                    knowledge_gaps=[],
+                    metacognitive_awareness=0.5,
+                    learning_indicators=["engagement"],
+                    cognitive_strategies=["problem_decomposition"],
+                    emotional_state=EmotionalState.NEUTRAL,
+                    intervention_recommendations=["continue_monitoring"],
+                    confidence_level=0.5
+                )
+            
             # Use OpenAI for cognitive analysis
             response = self.openai_client.chat.completions.create(
                 model="gpt-4",
