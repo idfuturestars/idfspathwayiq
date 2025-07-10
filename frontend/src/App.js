@@ -207,9 +207,11 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ResponsiveProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ResponsiveProvider>
   );
 }
 
