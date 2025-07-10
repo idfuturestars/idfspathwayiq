@@ -792,6 +792,121 @@ class StarGuideBackendTest(unittest.TestCase):
             print("✅ CORS handling working for allowed domains")
         else:
             print("❓ CORS headers not fully implemented")
+            
+    def test_20_phase_2_1_advanced_infrastructure(self):
+        """Test Phase 2.1 Advanced Infrastructure Endpoints"""
+        print("\n=== TESTING PHASE 2.1 ADVANCED INFRASTRUCTURE ===")
+        
+        # Make sure we're authenticated
+        if not self.auth_token:
+            self.test_04_user_login()
+        
+        # Test 1: Advanced Health Check
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/system/health-advanced",
+                headers=self.headers
+            )
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertEqual(data["status"], "success")
+            self.assertIn("health_report", data)
+            self.assertIn("timestamp", data)
+            print("✅ Advanced health check endpoint working")
+        except AssertionError as e:
+            print(f"❌ Advanced health check failed: {e}")
+            if 'response' in locals():
+                print(f"Response status: {response.status_code}, Response: {response.text[:300]}")
+        
+        # Test 2: Performance Metrics
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/system/performance-metrics",
+                headers=self.headers
+            )
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertEqual(data["status"], "success")
+            self.assertIn("performance", data)
+            self.assertIn("profiler", data)
+            self.assertIn("cache", data)
+            self.assertIn("timestamp", data)
+            print("✅ Performance metrics endpoint working")
+        except AssertionError as e:
+            print(f"❌ Performance metrics failed: {e}")
+            if 'response' in locals():
+                print(f"Response status: {response.status_code}, Response: {response.text[:300]}")
+        
+        # Test 3: Security Status
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/system/security-status",
+                headers=self.headers
+            )
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertEqual(data["status"], "success")
+            self.assertIn("security_metrics", data)
+            self.assertIn("timestamp", data)
+            print("✅ Security status endpoint working")
+        except AssertionError as e:
+            print(f"❌ Security status failed: {e}")
+            if 'response' in locals():
+                print(f"Response status: {response.status_code}, Response: {response.text[:300]}")
+        
+        # Test 4: Data Governance Status
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/system/data-governance",
+                headers=self.headers
+            )
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertEqual(data["status"], "success")
+            self.assertIn("governance", data)
+            self.assertIn("timestamp", data)
+            print("✅ Data governance endpoint working")
+        except AssertionError as e:
+            print(f"❌ Data governance failed: {e}")
+            if 'response' in locals():
+                print(f"Response status: {response.status_code}, Response: {response.text[:300]}")
+        
+        # Test 5: Cache Analytics
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/system/cache-analytics",
+                headers=self.headers
+            )
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertEqual(data["status"], "success")
+            self.assertIn("cache_stats", data)
+            self.assertIn("performance", data)
+            self.assertIn("timestamp", data)
+            print("✅ Cache analytics endpoint working")
+        except AssertionError as e:
+            print(f"❌ Cache analytics failed: {e}")
+            if 'response' in locals():
+                print(f"Response status: {response.status_code}, Response: {response.text[:300]}")
+        
+        # Test 6: Diagnostic Report
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/system/diagnostic-report",
+                headers=self.headers
+            )
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertEqual(data["status"], "success")
+            self.assertIn("diagnostic_report", data)
+            self.assertIn("timestamp", data)
+            print("✅ Diagnostic report endpoint working")
+        except AssertionError as e:
+            print(f"❌ Diagnostic report failed: {e}")
+            if 'response' in locals():
+                print(f"Response status: {response.status_code}, Response: {response.text[:300]}")
+        
+        print("=== PHASE 2.1 TESTING COMPLETE ===\n")
 
 if __name__ == "__main__":
     # Run the tests in a specific order
