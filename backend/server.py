@@ -2087,6 +2087,34 @@ async def startup_event():
         secure_token_manager = SecureTokenManager(JWT_SECRET)
         logger.info("✅ Secure Token Manager initialized")
         
+        # Phase 2.2: Initialize technical infrastructure components
+        
+        # Initialize CDN manager (if configured)
+        cdn_config = CDNConfiguration(
+            zone_id=os.environ.get('CLOUDFLARE_ZONE_ID', ''),
+            api_token=os.environ.get('CLOUDFLARE_API_TOKEN', ''),
+            domain=os.environ.get('DOMAIN_NAME', 'localhost')
+        )
+        if cdn_config.zone_id and cdn_config.api_token:
+            global cdn_manager
+            cdn_manager = initialize_cdn_manager(cdn_config)
+            await cdn_manager.initialize()
+            logger.info("✅ CDN Manager initialized")
+        
+        # Initialize analytics manager
+        analytics_config = AnalyticsConfiguration(
+            mixpanel_token=os.environ.get('MIXPANEL_TOKEN'),
+            google_analytics_id=os.environ.get('GA_TRACKING_ID'),
+            enable_internal_analytics=True
+        )
+        global analytics_manager
+        analytics_manager = initialize_analytics_manager(analytics_config)
+        await analytics_manager.initialize()
+        logger.info("✅ Analytics Manager initialized")
+        
+        # MLOps components are already initialized as globals
+        logger.info("✅ MLOps Framework initialized")
+        
     except Exception as e:
         logger.error(f"❌ Failed to initialize Phase 2.1 components: {e}")
         # Continue startup even if some components fail
