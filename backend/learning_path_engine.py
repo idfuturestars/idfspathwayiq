@@ -127,8 +127,17 @@ class AdvancedLearningPathRecommendationEngine:
         self.recommendation_cache = {}
         self.skill_embeddings = {}
         
-        # Initialize OpenAI client
-        self.openai_client = openai.OpenAI()
+        # Initialize OpenAI client with proper error handling
+        try:
+            openai_key = os.environ.get('OPENAI_API_KEY')
+            if openai_key:
+                self.openai_client = openai.OpenAI(api_key=openai_key)
+            else:
+                logger.warning("OPENAI_API_KEY not found, OpenAI features will be disabled")
+                self.openai_client = None
+        except Exception as e:
+            logger.error(f"Failed to initialize OpenAI client: {e}")
+            self.openai_client = None
         
         # Load or create knowledge graph
         self._initialize_skills_graph()
