@@ -2047,7 +2047,40 @@ async def system_statistics(current_user: dict = Depends(get_current_user)):
 # Startup event
 @app.on_event("startup")
 async def startup_event():
-    logger.info("StarGuide API starting up...")
+    logger.info("🚀 PathwayIQ API starting up with Phase 2.1 enhancements...")
+    
+    # Phase 2.1: Initialize advanced infrastructure components
+    try:
+        # Initialize Redis cache manager
+        await cache_manager.initialize()
+        logger.info("✅ Advanced Cache Manager initialized")
+        
+        # Initialize performance monitoring
+        await performance_monitor.start_monitoring()
+        logger.info("✅ Performance Monitor started")
+        
+        # Initialize security middleware components
+        global security_middleware
+        security_middleware = create_security_middleware(redis_client)
+        logger.info("✅ Advanced Security components initialized")
+        
+        # Initialize data governance
+        initialize_default_schemas(data_governance)
+        logger.info("✅ Data Governance Framework initialized")
+        
+        # Initialize advanced rate limiter
+        global advanced_rate_limiter
+        advanced_rate_limiter = AdvancedRateLimiter(redis_client)
+        logger.info("✅ Advanced Rate Limiter initialized")
+        
+        # Initialize secure token manager
+        global secure_token_manager
+        secure_token_manager = SecureTokenManager(JWT_SECRET)
+        logger.info("✅ Secure Token Manager initialized")
+        
+    except Exception as e:
+        logger.error(f"❌ Failed to initialize Phase 2.1 components: {e}")
+        # Continue startup even if some components fail
     
     # Create default badges
     default_badges = [
@@ -2062,6 +2095,8 @@ async def startup_event():
         if not existing:
             badge = Badge(**badge_data)
             await db.badges.insert_one(badge.dict())
+    
+    logger.info("🎉 PathwayIQ API startup complete with all Phase 2.1 enhancements!")
 
 # ============================================================================
 # PHASE 1: ADVANCED AI CAPABILITIES ENDPOINTS
