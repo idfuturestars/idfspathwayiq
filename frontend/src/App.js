@@ -20,6 +20,8 @@ import PathwayAchievements from './pages/PathwayAchievements';
 import NavigatorHub from './pages/NavigatorHub';
 import CareerInsights from './pages/CareerInsights';
 import LoadingScreen from './components/LoadingScreen';
+import LearningPathways from './pages/LearningPathways';
+import CareerExplorer from './pages/CareerExplorer';
 import './App.css';
 
 // Protected Route Component
