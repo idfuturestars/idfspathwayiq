@@ -18,6 +18,18 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
+
+  // Aggressive fallback: Force loading to false after 5 seconds
+  useEffect(() => {
+    const fallbackTimeout = setTimeout(() => {
+      console.log('🚨 AuthContext: FALLBACK TIMEOUT - Forcing loading to false');
+      setLoadingTimeout(true);
+      setLoading(false);
+    }, 5000);
+
+    return () => clearTimeout(fallbackTimeout);
+  }, []);
 
   // Set axios default headers
   useEffect(() => {
