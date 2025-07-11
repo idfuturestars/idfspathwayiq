@@ -210,11 +210,15 @@ function AppContent() {
 
 function App() {
   return (
-    <ResponsiveProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </ResponsiveProvider>
+    <ThemeProvider>
+      <ResponsiveProvider>
+        <AuthProvider>
+          <PomodoroProvider>
+            <AppContent />
+          </PomodoroProvider>
+        </AuthProvider>
+      </ResponsiveProvider>
+    </ThemeProvider>
   );
 }
 
