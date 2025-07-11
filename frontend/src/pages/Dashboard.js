@@ -374,6 +374,148 @@ const Dashboard = () => {
           ))}
         </div>
       </div>
+
+      {/* Enhanced Features Section */}
+      <div className="starguide-card">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-white">🚀 Enhanced Features</h2>
+          <button
+            onClick={() => setShowFeatures(!showFeatures)}
+            className="btn-secondary"
+          >
+            {showFeatures ? 'Hide' : 'Show'} Features
+          </button>
+        </div>
+
+        {showFeatures && (
+          <div className="space-y-6">
+            {/* Pomodoro Timer */}
+            <div className="bg-gray-700 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <ClockIcon className="w-6 h-6 text-blue-400 mr-3" />
+                  <h3 className="text-lg font-semibold text-white">Focus Timer</h3>
+                </div>
+                <div className="text-white text-xl font-mono">
+                  {formatTime(timeLeft)}
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-gray-400">
+                  Mode: <span className="text-white capitalize">{mode.replace('_', ' ')}</span>
+                </div>
+                <div className="text-gray-400">
+                  Sessions: <span className="text-orange-400">{completedSessions}</span>
+                </div>
+              </div>
+              
+              <div className="flex space-x-3">
+                <button
+                  onClick={isActive ? pauseTimer : startTimer}
+                  className={`btn-primary ${isActive ? 'bg-red-600 hover:bg-red-700' : ''}`}
+                >
+                  {isActive ? 'Pause' : 'Start'} Focus
+                </button>
+                <button
+                  onClick={() => navigate('/pomodoro')}
+                  className="btn-secondary"
+                >
+                  Full Timer
+                </button>
+              </div>
+            </div>
+
+            {/* Theme Switcher */}
+            <div className="bg-gray-700 rounded-lg p-4">
+              <div className="flex items-center mb-4">
+                <SwatchIcon className="w-6 h-6 text-purple-400 mr-3" />
+                <h3 className="text-lg font-semibold text-white">Theme & Accessibility</h3>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                {availableThemes.map((themeName) => (
+                  <button
+                    key={themeName}
+                    onClick={() => changeTheme(themeName)}
+                    className={`p-2 rounded-lg text-sm transition-colors ${
+                      theme.name === themeName 
+                        ? 'bg-purple-600 text-white' 
+                        : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                    }`}
+                  >
+                    {themeName.charAt(0).toUpperCase() + themeName.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Voice Learning */}
+            <div className="bg-gray-700 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <MicrophoneIcon className="w-6 h-6 text-green-400 mr-3" />
+                  <h3 className="text-lg font-semibold text-white">Voice Learning</h3>
+                </div>
+                <button
+                  onClick={() => setShowVoiceMode(!showVoiceMode)}
+                  className="btn-secondary"
+                >
+                  {showVoiceMode ? 'Hide' : 'Show'} Voice Mode
+                </button>
+              </div>
+              
+              {showVoiceMode && (
+                <VoiceToTextLearning
+                  onQuestion={(question) => console.log('Voice question:', question)}
+                  onResponse={(response) => console.log('AI response:', response)}
+                />
+              )}
+            </div>
+
+            {/* Quick Feature Access */}
+            <div className="bg-gray-700 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-white mb-4">Quick Access</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <button
+                  onClick={() => navigate('/ai-study-buddy')}
+                  className="bg-gray-600 hover:bg-gray-500 p-3 rounded-lg text-center transition-colors"
+                >
+                  <ChatBubbleLeftRightIcon className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+                  <span className="text-white text-sm">AI Study Buddy</span>
+                </button>
+                
+                <button
+                  onClick={() => navigate('/habits')}
+                  className="bg-gray-600 hover:bg-gray-500 p-3 rounded-lg text-center transition-colors"
+                >
+                  <FireIcon className="w-6 h-6 text-orange-400 mx-auto mb-2" />
+                  <span className="text-white text-sm">Habit Tracker</span>
+                </button>
+                
+                <button
+                  onClick={() => navigate('/learning-battles')}
+                  className="bg-gray-600 hover:bg-gray-500 p-3 rounded-lg text-center transition-colors"
+                >
+                  <TrophyIcon className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
+                  <span className="text-white text-sm">Learning Battles</span>
+                </button>
+                
+                <button
+                  onClick={() => navigate('/study-journal')}
+                  className="bg-gray-600 hover:bg-gray-500 p-3 rounded-lg text-center transition-colors"
+                >
+                  <BookOpenIcon className="w-6 h-6 text-green-400 mx-auto mb-2" />
+                  <span className="text-white text-sm">Study Journal</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Habit Tracker Section */}
+      <HabitTracker className="mb-8" />
     </div>
   );
 };
