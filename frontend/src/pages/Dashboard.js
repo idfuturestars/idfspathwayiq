@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../contexts/ThemeContext';
+import { usePomodoro } from '../contexts/PomodoroContext';
 import axios from 'axios';
 import {
   HomeIcon,
@@ -14,8 +16,14 @@ import {
   PlayIcon,
   AcademicCapIcon,
   BriefcaseIcon,
-  MapIcon
+  MapIcon,
+  MicrophoneIcon,
+  ClockIcon,
+  SwatchIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
+import VoiceToTextLearning from '../components/VoiceToTextLearning';
+import HabitTracker from '../components/HabitTracker';
 
 const Dashboard = () => {
   const { user } = useAuth();
