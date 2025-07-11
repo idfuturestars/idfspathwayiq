@@ -122,6 +122,34 @@ class IDFSContentManager:
                     "2025 HBCU HIM.docx"
                 ],
                 "pathway_type": PathwayType.FOUR_YEAR_COLLEGE
+            },
+            "are_you_the_one": {
+                "files": [],  # Will be populated with IDFS website content
+                "pathway_type": PathwayType.ARE_YOU_THE_ONE,
+                "external_content": {
+                    "name": "Are You The One?™️",
+                    "target_audience": "Ages 16 to 25",
+                    "purpose": "Foster cognitive, transactional, and STEM skills through experiential learning",
+                    "methodology": {
+                        "approach": "Practical, skill-based learning and real-world application",
+                        "evaluation_components": [
+                            "Academic Background Review",
+                            "Technical Skills and Cognitive Abilities Assessment", 
+                            "Extracurricular Involvement and Technical Achievements Evaluation",
+                            "Personal Motivation and Career Interests Analysis",
+                            "Social and Emotional Competence Review",
+                            "Special Talents and Career Pathways Matching"
+                        ]
+                    },
+                    "focus_areas": ["STEM", "Technical Trades", "Workforce Readiness", "Experiential Learning"],
+                    "unique_features": [
+                        "Holistic development assessment",
+                        "Global competitive ranking system",
+                        "IQ, EQ, transactional, technological, and problem-solving evaluation",
+                        "Alternative to traditional college pathways",
+                        "Direct workforce entry preparation"
+                    ]
+                }
             }
         }
         
