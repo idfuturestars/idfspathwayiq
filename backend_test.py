@@ -2088,6 +2088,12 @@ if __name__ == "__main__":
     test_suite.addTest(StarGuideBackendTest('test_25_phase_2_3_authentication_authorization'))
     test_suite.addTest(StarGuideBackendTest('test_26_phase_2_3_core_api_endpoints'))
     test_suite.addTest(StarGuideBackendTest('test_27_phase_2_3_backend_integrations'))
+    test_suite.addTest(StarGuideBackendTest('test_28_idfs_content_manager'))
+    test_suite.addTest(StarGuideBackendTest('test_29_idfs_api_endpoints'))
+    test_suite.addTest(StarGuideBackendTest('test_30_idfs_authentication_authorization'))
+    test_suite.addTest(StarGuideBackendTest('test_31_idfs_database_integration'))
+    test_suite.addTest(StarGuideBackendTest('test_32_idfs_error_handling'))
+    test_suite.addTest(StarGuideBackendTest('test_33_idfs_content_processing'))
     
     runner = unittest.TextTestRunner()
     runner.run(test_suite)
