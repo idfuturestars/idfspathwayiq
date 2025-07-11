@@ -66,20 +66,25 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
+      console.log('🔐 AuthContext: Starting login for', email);
       const response = await axios.post(`${API_URL}/api/auth/login`, {
         email,
         password,
       });
 
+      console.log('✅ AuthContext: Login response received:', response.data);
       const { access_token, user: userData } = response.data;
       
+      console.log('💾 AuthContext: Storing token and user data');
       localStorage.setItem('token', access_token);
       setToken(access_token);
       setUser(userData);
       
-      toast.success(`Welcome back, ${userData.username}!`);
+      console.log('🎉 AuthContext: Login successful, showing toast');
+      toast.success(`Welcome back, ${userData.username || userData.email}!`);
       return { success: true };
     } catch (error) {
+      console.error('❌ AuthContext: Login failed:', error);
       const message = error.response?.data?.detail || 'Login failed';
       toast.error(message);
       return { success: false, error: message };
