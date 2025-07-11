@@ -258,6 +258,9 @@ security = HTTPBearer()
 app = FastAPI(title="StarGuide API", description="IDFS PathwayIQ™ Educational Platform")
 api_router = APIRouter(prefix="/api")
 
+# Initialize IDFS Content Manager
+idfs_content_manager = IDFSContentManager(client)
+
 # CORS Configuration - Multi-domain support for StarGuide deployment
 app.add_middleware(
     CORSMiddleware,
