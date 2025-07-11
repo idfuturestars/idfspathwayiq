@@ -2437,6 +2437,7 @@ if __name__ == "__main__":
     test_suite.addTest(StarGuideBackendTest('test_31_idfs_database_integration'))
     test_suite.addTest(StarGuideBackendTest('test_32_idfs_error_handling'))
     test_suite.addTest(StarGuideBackendTest('test_33_idfs_content_processing'))
+    test_suite.addTest(StarGuideBackendTest('test_34_are_you_the_one_pathway_system'))
     
     runner = unittest.TextTestRunner()
     runner.run(test_suite)
