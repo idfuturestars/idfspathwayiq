@@ -510,6 +510,11 @@ class IDFSContentManager:
         """Get all learning pathways"""
         try:
             pathways = await self.pathways_collection.find().to_list(100)
+            
+            # Remove MongoDB _id fields to avoid serialization issues
+            for pathway in pathways:
+                pathway.pop("_id", None)
+            
             return pathways
             
         except Exception as e:
