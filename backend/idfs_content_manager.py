@@ -167,6 +167,9 @@ class IDFSContentManager:
             for category, config in self.content_categories.items():
                 await self.process_content_category(category, config)
             
+            # Create special "Are You The One™" content module
+            await self.create_are_you_the_one_module()
+            
             # Create learning pathways
             await self.create_learning_pathways()
             
