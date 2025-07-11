@@ -802,11 +802,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "IDFS Content Manager Implementation"
-    - "IDFS API Endpoints"
     - "Learning Pathways Frontend Component"
     - "Career Explorer Frontend Component"
-    - "IDFS Content Database Initialization"
     - "Dashboard IDFS Integration"
     - "App.js Route Integration"
   stuck_tasks: []
