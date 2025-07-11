@@ -607,6 +607,55 @@ class AdvancedVoiceToText:
             
             # Fallback analysis
             return self._fallback_think_aloud_analysis(transcribed_text)
+            
+    async def generate_study_buddy_response(self, question: str, user_context: dict) -> str:
+        """Generate AI Study Buddy response for voice questions"""
+        try:
+            # Check if OpenAI client is available
+            if not self.openai_client:
+                return self._generate_fallback_study_response(question)
+            
+            # Create context-aware prompt
+            prompt = f"""You are an AI Study Buddy designed to help students learn effectively. 
+            
+Student Question: {question}
+User Context: {user_context}
+
+Please provide a helpful, encouraging, and educational response that:
+1. Directly addresses their question
+2. Explains concepts in simple terms
+3. Provides examples or analogies
+4. Offers different ways to understand the topic
+5. Encourages further learning
+
+Keep your response conversational and supportive, as if you're a friendly tutor."""
+
+            response = self.openai_client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a supportive AI Study Buddy that helps students learn by explaining concepts clearly and encouraging their curiosity."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=300,
+                temperature=0.7
+            )
+            
+            return response.choices[0].message.content.strip()
+            
+        except Exception as e:
+            logger.error(f"Error generating study buddy response: {e}")
+            return self._generate_fallback_study_response(question)
+    
+    def _generate_fallback_study_response(self, question: str) -> str:
+        """Generate fallback response when AI is not available"""
+        responses = [
+            f"That's a great question about {question}! Let me help you understand this better. Could you tell me what specific part is confusing you?",
+            f"I can see you're thinking about {question}. This is an important topic! Would you like me to break it down into smaller parts?",
+            f"Excellent question! {question} is something many students ask about. Let's explore this together - what do you already know about this topic?",
+            f"You're asking about {question} - that shows great curiosity! Let me explain this in a way that might help you understand it better.",
+        ]
+        import random
+        return random.choice(responses)
     
     def _fallback_think_aloud_analysis(self, text: str) -> ThinkAloudAnalysis:
         """Fallback think-aloud analysis using pattern matching"""
