@@ -654,6 +654,9 @@ Keep your response conversational and supportive, as if you're a friendly tutor.
             f"Excellent question! {question} is something many students ask about. Let's explore this together - what do you already know about this topic?",
             f"You're asking about {question} - that shows great curiosity! Let me explain this in a way that might help you understand it better.",
         ]
+        import random
+        return random.choice(responses)
+            
     async def generate_journal_insights(self, content: str, context: dict) -> str:
         """Generate AI insights for journal entries"""
         try:
