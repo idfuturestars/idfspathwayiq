@@ -41,7 +41,8 @@ const CareerExplorer = () => {
     { id: 'social_services', name: 'Social Services', icon: HandRaisedIcon, color: 'bg-indigo-500' },
     { id: 'government', name: 'Government & Public Service', icon: BuildingOfficeIcon, color: 'bg-gray-500' },
     { id: 'law', name: 'Law & Justice', icon: ScaleIcon, color: 'bg-orange-500' },
-    { id: 'hospitality', name: 'Hospitality & Tourism', icon: GlobeAltIcon, color: 'bg-teal-500' }
+    { id: 'hospitality', name: 'Hospitality & Tourism', icon: GlobeAltIcon, color: 'bg-teal-500' },
+    { id: 'are_you_the_one', name: 'Are You The One™ - Elite Development', icon: StarIcon, color: 'bg-gradient-to-r from-purple-600 to-blue-600' }
   ];
 
   useEffect(() => {
