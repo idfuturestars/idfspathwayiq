@@ -28,8 +28,22 @@ import HabitTracker from '../components/HabitTracker';
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { theme, changeTheme, availableThemes } = useTheme();
+  const { 
+    timeLeft, 
+    isActive, 
+    completedSessions, 
+    formatTime, 
+    startTimer, 
+    pauseTimer, 
+    mode, 
+    TIMER_MODES 
+  } = usePomodoro();
+  
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showVoiceMode, setShowVoiceMode] = useState(false);
+  const [showFeatures, setShowFeatures] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
