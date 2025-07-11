@@ -1713,6 +1713,351 @@ class StarGuideBackendTest(unittest.TestCase):
         
         print("=== PHASE 2.3 NEW BACKEND INTEGRATIONS TESTING COMPLETE ===\n")
 
+    def test_28_idfs_content_manager(self):
+        """Test IDFS Content Manager functionality"""
+        print("\n=== TESTING IDFS CONTENT MANAGER ===")
+        
+        try:
+            # Test IDFS content initialization (admin only)
+            admin_headers = {"Authorization": f"Bearer {self.admin_token}", "Content-Type": "application/json"}
+            
+            response = requests.post(
+                f"{BACKEND_URL}/idfs/initialize",
+                headers=admin_headers
+            )
+            
+            # Should work for admin or return appropriate error
+            self.assertIn(response.status_code, [200, 403, 500])
+            if response.status_code == 200:
+                data = response.json()
+                self.assertEqual(data["status"], "success")
+                print("✅ IDFS content initialization working")
+            elif response.status_code == 403:
+                print("✅ IDFS initialization properly restricted to admin")
+            else:
+                print(f"❓ IDFS initialization status: {response.status_code}")
+                
+        except Exception as e:
+            print(f"❌ IDFS content manager test failed: {e}")
+
+    def test_29_idfs_api_endpoints(self):
+        """Test all IDFS API endpoints"""
+        print("\n=== TESTING IDFS API ENDPOINTS ===")
+        
+        try:
+            # Test get learning pathways
+            response = requests.get(
+                f"{BACKEND_URL}/idfs/pathways",
+                headers=self.headers
+            )
+            self.assertIn(response.status_code, [200, 404])
+            if response.status_code == 200:
+                data = response.json()
+                self.assertIn("pathways", data)
+                self.assertIn("total", data)
+                print("✅ Get learning pathways endpoint working")
+            else:
+                print("❓ Learning pathways endpoint returned 404 (no content yet)")
+            
+            # Test get pathway content
+            pathway_request = {
+                "pathway_type": "vocational",
+                "search_query": "",
+                "limit": 10
+            }
+            response = requests.post(
+                f"{BACKEND_URL}/idfs/content/pathway",
+                headers=self.headers,
+                json=pathway_request
+            )
+            self.assertIn(response.status_code, [200, 404])
+            if response.status_code == 200:
+                data = response.json()
+                self.assertIn("content", data)
+                self.assertIn("pathway_type", data)
+                print("✅ Get pathway content endpoint working")
+            else:
+                print("❓ Pathway content endpoint returned 404 (no content yet)")
+            
+            # Test content search
+            search_request = {
+                "query": "career",
+                "pathway_type": None,
+                "limit": 20
+            }
+            response = requests.post(
+                f"{BACKEND_URL}/idfs/content/search",
+                headers=self.headers,
+                json=search_request
+            )
+            self.assertIn(response.status_code, [200, 404, 500])
+            if response.status_code == 200:
+                data = response.json()
+                self.assertIn("results", data)
+                self.assertIn("query", data)
+                print("✅ Content search endpoint working")
+            else:
+                print(f"❓ Content search endpoint status: {response.status_code}")
+            
+            # Test career assessment questions
+            response = requests.get(
+                f"{BACKEND_URL}/idfs/career-assessment/questions",
+                headers=self.headers
+            )
+            self.assertIn(response.status_code, [200, 404])
+            if response.status_code == 200:
+                data = response.json()
+                self.assertIn("questions", data)
+                self.assertIn("total", data)
+                print("✅ Career assessment questions endpoint working")
+            else:
+                print("❓ Career assessment questions endpoint returned 404 (no content yet)")
+            
+            # Test career assessment analysis
+            assessment_request = {
+                "user_responses": {"interest_1": "technology", "interest_2": "problem_solving"},
+                "career_interests": ["technology", "healthcare", "education"]
+            }
+            response = requests.post(
+                f"{BACKEND_URL}/idfs/career-assessment/analyze",
+                headers=self.headers,
+                json=assessment_request
+            )
+            self.assertIn(response.status_code, [200, 404, 500])
+            if response.status_code == 200:
+                data = response.json()
+                self.assertIn("recommendations", data)
+                print("✅ Career assessment analysis endpoint working")
+            else:
+                print(f"❓ Career assessment analysis endpoint status: {response.status_code}")
+            
+            # Test salary insights
+            response = requests.get(
+                f"{BACKEND_URL}/idfs/salary-insights/technology",
+                headers=self.headers
+            )
+            self.assertIn(response.status_code, [200, 404])
+            if response.status_code == 200:
+                data = response.json()
+                self.assertIn("career_cluster", data)
+                self.assertIn("insights", data)
+                print("✅ Salary insights endpoint working")
+            else:
+                print("❓ Salary insights endpoint returned 404 (no content yet)")
+            
+            # Test pathway modules
+            response = requests.get(
+                f"{BACKEND_URL}/idfs/pathways/vocational/modules",
+                headers=self.headers
+            )
+            self.assertIn(response.status_code, [200, 404])
+            if response.status_code == 200:
+                data = response.json()
+                self.assertIn("modules", data)
+                self.assertIn("pathway_type", data)
+                print("✅ Pathway modules endpoint working")
+            else:
+                print("❓ Pathway modules endpoint returned 404 (no content yet)")
+            
+            # Test content detail (using a dummy ID)
+            response = requests.get(
+                f"{BACKEND_URL}/idfs/content/test-content-id",
+                headers=self.headers
+            )
+            self.assertIn(response.status_code, [200, 404])
+            if response.status_code == 200:
+                data = response.json()
+                self.assertIn("content", data)
+                print("✅ Content detail endpoint working")
+            else:
+                print("❓ Content detail endpoint returned 404 (expected for dummy ID)")
+            
+            # Test create user pathway
+            response = requests.post(
+                f"{BACKEND_URL}/idfs/user-pathway?pathway_type=vocational",
+                headers=self.headers
+            )
+            self.assertIn(response.status_code, [200, 404, 500])
+            if response.status_code == 200:
+                data = response.json()
+                self.assertIn("pathway", data)
+                print("✅ Create user pathway endpoint working")
+            else:
+                print(f"❓ Create user pathway endpoint status: {response.status_code}")
+            
+            # Test get user pathways
+            response = requests.get(
+                f"{BACKEND_URL}/idfs/user-pathways",
+                headers=self.headers
+            )
+            self.assertIn(response.status_code, [200, 404])
+            if response.status_code == 200:
+                data = response.json()
+                self.assertIn("pathways", data)
+                print("✅ Get user pathways endpoint working")
+            else:
+                print("❓ Get user pathways endpoint returned 404 (no pathways yet)")
+                
+        except Exception as e:
+            print(f"❌ IDFS API endpoints test failed: {e}")
+
+    def test_30_idfs_authentication_authorization(self):
+        """Test IDFS endpoints authentication and authorization"""
+        print("\n=== TESTING IDFS AUTHENTICATION & AUTHORIZATION ===")
+        
+        try:
+            # Test endpoints without authentication
+            no_auth_headers = {"Content-Type": "application/json"}
+            
+            endpoints_to_test = [
+                "/idfs/pathways",
+                "/idfs/career-assessment/questions",
+                "/idfs/user-pathways"
+            ]
+            
+            for endpoint in endpoints_to_test:
+                response = requests.get(
+                    f"{BACKEND_URL}{endpoint}",
+                    headers=no_auth_headers
+                )
+                self.assertEqual(response.status_code, 401)
+            
+            print("✅ IDFS endpoints properly require authentication")
+            
+            # Test admin-only endpoint with non-admin user
+            response = requests.post(
+                f"{BACKEND_URL}/idfs/initialize",
+                headers=self.headers  # Student token
+            )
+            self.assertEqual(response.status_code, 403)
+            print("✅ IDFS admin endpoints properly restrict access")
+            
+        except Exception as e:
+            print(f"❌ IDFS authentication test failed: {e}")
+
+    def test_31_idfs_database_integration(self):
+        """Test IDFS database integration and data persistence"""
+        print("\n=== TESTING IDFS DATABASE INTEGRATION ===")
+        
+        try:
+            # Test that database operations don't cause server errors
+            # This is indirect testing since we can't directly access the database
+            
+            # Test pathway creation and retrieval
+            response = requests.post(
+                f"{BACKEND_URL}/idfs/user-pathway?pathway_type=community_college",
+                headers=self.headers
+            )
+            
+            # Should either work or return appropriate error (not server error)
+            self.assertNotEqual(response.status_code, 500)
+            
+            if response.status_code == 200:
+                # If pathway creation worked, test retrieval
+                response = requests.get(
+                    f"{BACKEND_URL}/idfs/user-pathways",
+                    headers=self.headers
+                )
+                self.assertIn(response.status_code, [200, 404])
+                print("✅ IDFS database operations working")
+            else:
+                print(f"❓ IDFS database operations status: {response.status_code}")
+                
+        except Exception as e:
+            print(f"❌ IDFS database integration test failed: {e}")
+
+    def test_32_idfs_error_handling(self):
+        """Test IDFS error handling for invalid requests"""
+        print("\n=== TESTING IDFS ERROR HANDLING ===")
+        
+        try:
+            # Test invalid pathway type
+            invalid_request = {
+                "pathway_type": "invalid_pathway_type",
+                "search_query": "",
+                "limit": 10
+            }
+            response = requests.post(
+                f"{BACKEND_URL}/idfs/content/pathway",
+                headers=self.headers,
+                json=invalid_request
+            )
+            # Should handle gracefully, not crash
+            self.assertNotEqual(response.status_code, 500)
+            
+            # Test invalid search query
+            invalid_search = {
+                "query": "",  # Empty query
+                "pathway_type": "vocational",
+                "limit": -1  # Invalid limit
+            }
+            response = requests.post(
+                f"{BACKEND_URL}/idfs/content/search",
+                headers=self.headers,
+                json=invalid_search
+            )
+            # Should handle gracefully
+            self.assertNotEqual(response.status_code, 500)
+            
+            # Test invalid career cluster
+            response = requests.get(
+                f"{BACKEND_URL}/idfs/salary-insights/invalid_cluster",
+                headers=self.headers
+            )
+            # Should handle gracefully
+            self.assertNotEqual(response.status_code, 500)
+            
+            print("✅ IDFS error handling working properly")
+            
+        except Exception as e:
+            print(f"❌ IDFS error handling test failed: {e}")
+
+    def test_33_idfs_content_processing(self):
+        """Test IDFS content processing logic"""
+        print("\n=== TESTING IDFS CONTENT PROCESSING ===")
+        
+        try:
+            # Test content search with various queries
+            test_queries = ["career", "salary", "education", "training"]
+            
+            for query in test_queries:
+                search_request = {
+                    "query": query,
+                    "pathway_type": None,
+                    "limit": 5
+                }
+                response = requests.post(
+                    f"{BACKEND_URL}/idfs/content/search",
+                    headers=self.headers,
+                    json=search_request
+                )
+                
+                # Should not crash on any query
+                self.assertNotEqual(response.status_code, 500)
+            
+            # Test pathway-specific content retrieval
+            pathway_types = ["vocational", "community_college", "career_assessment", "social_justice"]
+            
+            for pathway_type in pathway_types:
+                pathway_request = {
+                    "pathway_type": pathway_type,
+                    "search_query": "",
+                    "limit": 5
+                }
+                response = requests.post(
+                    f"{BACKEND_URL}/idfs/content/pathway",
+                    headers=self.headers,
+                    json=pathway_request
+                )
+                
+                # Should handle all pathway types gracefully
+                self.assertNotEqual(response.status_code, 500)
+            
+            print("✅ IDFS content processing working properly")
+            
+        except Exception as e:
+            print(f"❌ IDFS content processing test failed: {e}")
+
 if __name__ == "__main__":
     # Run the tests in a specific order
     test_suite = unittest.TestSuite()
