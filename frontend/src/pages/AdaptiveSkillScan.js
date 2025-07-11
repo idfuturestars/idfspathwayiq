@@ -56,7 +56,7 @@ const AdaptiveSkillScan = () => {
     // Check if there's a saved assessment config in localStorage
     const saved = localStorage.getItem('adaptiveAssessmentConfig');
     return saved ? JSON.parse(saved) : {
-      subject: '',
+      subject: 'Mathematics',  // Default to Mathematics
       target_grade_level: '',
       assessment_type: 'talent_discovery',
       enable_think_aloud: true,
