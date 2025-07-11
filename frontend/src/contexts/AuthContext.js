@@ -137,12 +137,12 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     token,
-    loading,
+    loading: loading && !loadingTimeout, // Force loading to false if timeout occurred
     login,
     register,
     logout,
     updateUser,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user || (!!token && loadingTimeout), // Consider authenticated if we have a token and timeout occurred
   };
 
   return (
