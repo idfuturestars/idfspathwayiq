@@ -166,6 +166,22 @@ function AppContent() {
               </ProtectedRoute>
             } 
           />
+          <Route 
+            path="/learning-pathways" 
+            element={
+              <ProtectedRoute>
+                <LearningPathways />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/career-explorer" 
+            element={
+              <ProtectedRoute>
+                <CareerExplorer />
+              </ProtectedRoute>
+            } 
+          />
           
           {/* Legacy route redirects for backward compatibility */}
           <Route path="/adaptive-skillscan" element={<Navigate to="/talent-compass" replace />} />
