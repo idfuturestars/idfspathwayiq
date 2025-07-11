@@ -3072,6 +3072,318 @@ async def conduct_learning_style_assessment(
 # END PHASE 1 ENDPOINTS
 # ============================================================================
 
+# ============================================================================
+# IDFS CONTENT INTEGRATION ENDPOINTS
+# ============================================================================
+
+class PathwayContentRequest(BaseModel):
+    pathway_type: str
+    search_query: Optional[str] = None
+    limit: int = 50
+
+class ContentSearchRequest(BaseModel):
+    query: str
+    pathway_type: Optional[str] = None
+    limit: int = 20
+
+class CareerAssessmentRequest(BaseModel):
+    user_responses: Dict[str, Any]
+    career_interests: List[str]
+
+@api_router.post("/idfs/initialize")
+async def initialize_idfs_content(current_user: User = Depends(get_current_user)):
+    """Initialize IDFS content database (Admin only)"""
+    try:
+        if current_user.role != UserRole.ADMIN:
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        await idfs_content_manager.initialize_content_database()
+        
+        return {
+            "message": "IDFS content database initialized successfully",
+            "status": "success",
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error initializing IDFS content: {e}")
+        raise HTTPException(status_code=500, detail="Failed to initialize IDFS content")
+
+@api_router.get("/idfs/pathways")
+async def get_learning_pathways(current_user: User = Depends(get_current_user)):
+    """Get all available learning pathways"""
+    try:
+        pathways = await idfs_content_manager.get_learning_pathways()
+        return {
+            "pathways": pathways,
+            "total": len(pathways),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting learning pathways: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get learning pathways")
+
+@api_router.post("/idfs/content/pathway")
+async def get_pathway_content(
+    request: PathwayContentRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Get content for a specific pathway type"""
+    try:
+        content = await idfs_content_manager.get_content_by_pathway(request.pathway_type)
+        
+        # Filter by search query if provided
+        if request.search_query:
+            content = [
+                module for module in content 
+                if request.search_query.lower() in module.get('content', '').lower() or
+                   request.search_query.lower() in module.get('title', '').lower()
+            ]
+        
+        # Limit results
+        content = content[:request.limit]
+        
+        return {
+            "pathway_type": request.pathway_type,
+            "content": content,
+            "total": len(content),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting pathway content: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get pathway content")
+
+@api_router.post("/idfs/content/search")
+async def search_content(
+    request: ContentSearchRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Search IDFS content"""
+    try:
+        results = await idfs_content_manager.search_content(
+            request.query, 
+            request.pathway_type
+        )
+        
+        # Limit results
+        results = results[:request.limit]
+        
+        return {
+            "query": request.query,
+            "pathway_type": request.pathway_type,
+            "results": results,
+            "total": len(results),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error searching content: {e}")
+        raise HTTPException(status_code=500, detail="Failed to search content")
+
+@api_router.get("/idfs/career-assessment/questions")
+async def get_career_assessment_questions(current_user: User = Depends(get_current_user)):
+    """Get career assessment questions"""
+    try:
+        questions = await idfs_content_manager.get_career_assessment_questions()
+        
+        return {
+            "questions": questions,
+            "total": len(questions),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting career assessment questions: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get career assessment questions")
+
+@api_router.post("/idfs/career-assessment/analyze")
+async def analyze_career_assessment(
+    request: CareerAssessmentRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Analyze career assessment responses"""
+    try:
+        # Get recommended career clusters based on responses
+        career_clusters = request.career_interests
+        
+        # Get salary insights for each cluster
+        salary_insights = []
+        for cluster in career_clusters:
+            insights = await idfs_content_manager.get_salary_insights(cluster)
+            if insights:
+                salary_insights.append(insights)
+        
+        # Get relevant pathways
+        pathways = await idfs_content_manager.get_learning_pathways()
+        
+        # Create recommendations
+        recommendations = {
+            "career_clusters": career_clusters,
+            "salary_insights": salary_insights,
+            "recommended_pathways": pathways,
+            "user_responses": request.user_responses,
+            "analysis_date": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Save assessment result
+        assessment_result = {
+            "user_id": current_user.id,
+            "assessment_type": "career_interest",
+            "recommendations": recommendations,
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        await db.career_assessments.insert_one(assessment_result)
+        
+        return recommendations
+        
+    except Exception as e:
+        logger.error(f"Error analyzing career assessment: {e}")
+        raise HTTPException(status_code=500, detail="Failed to analyze career assessment")
+
+@api_router.get("/idfs/salary-insights/{career_cluster}")
+async def get_salary_insights(
+    career_cluster: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get salary insights for a specific career cluster"""
+    try:
+        insights = await idfs_content_manager.get_salary_insights(career_cluster)
+        
+        return {
+            "career_cluster": career_cluster,
+            "insights": insights,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting salary insights: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get salary insights")
+
+@api_router.get("/idfs/pathways/{pathway_type}/modules")
+async def get_pathway_modules(
+    pathway_type: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get detailed modules for a specific pathway"""
+    try:
+        content = await idfs_content_manager.get_content_by_pathway(pathway_type)
+        
+        # Format for detailed display
+        modules = []
+        for module in content:
+            modules.append({
+                "id": module.get("content_id"),
+                "title": module.get("title"),
+                "description": module.get("content", "")[:200] + "..." if len(module.get("content", "")) > 200 else module.get("content", ""),
+                "learning_objectives": module.get("learning_objectives", []),
+                "estimated_duration": module.get("estimated_duration"),
+                "difficulty_level": module.get("difficulty_level"),
+                "salary_info": module.get("salary_info"),
+                "career_clusters": module.get("career_clusters", []),
+                "prerequisites": module.get("prerequisites", [])
+            })
+        
+        return {
+            "pathway_type": pathway_type,
+            "modules": modules,
+            "total": len(modules),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting pathway modules: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get pathway modules")
+
+@api_router.get("/idfs/content/{content_id}")
+async def get_content_detail(
+    content_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get detailed content for a specific module"""
+    try:
+        content = await idfs_content_manager.content_collection.find_one(
+            {"content_id": content_id}
+        )
+        
+        if not content:
+            raise HTTPException(status_code=404, detail="Content not found")
+        
+        # Remove MongoDB _id field
+        content.pop("_id", None)
+        
+        return {
+            "content": content,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting content detail: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get content detail")
+
+@api_router.post("/idfs/user-pathway")
+async def create_user_pathway(
+    pathway_type: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a personalized learning pathway for user"""
+    try:
+        # Get pathway content
+        content = await idfs_content_manager.get_content_by_pathway(pathway_type)
+        
+        # Create personalized pathway
+        user_pathway = {
+            "user_id": current_user.id,
+            "pathway_type": pathway_type,
+            "progress": 0,
+            "completed_modules": [],
+            "current_module": content[0]["content_id"] if content else None,
+            "started_at": datetime.now(timezone.utc),
+            "estimated_completion": None,
+            "modules": [module["content_id"] for module in content]
+        }
+        
+        # Save to database
+        await db.user_pathways.insert_one(user_pathway)
+        
+        return {
+            "message": "User pathway created successfully",
+            "pathway": user_pathway,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error creating user pathway: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create user pathway")
+
+@api_router.get("/idfs/user-pathways")
+async def get_user_pathways(current_user: User = Depends(get_current_user)):
+    """Get user's learning pathways"""
+    try:
+        user_pathways = await db.user_pathways.find(
+            {"user_id": current_user.id}
+        ).to_list(50)
+        
+        # Remove MongoDB _id fields
+        for pathway in user_pathways:
+            pathway.pop("_id", None)
+        
+        return {
+            "pathways": user_pathways,
+            "total": len(user_pathways),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting user pathways: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get user pathways")
+
+# ============================================================================
+# END IDFS CONTENT INTEGRATION ENDPOINTS
+# ============================================================================
+
 # Include router in main app (MUST BE AFTER ALL ENDPOINTS ARE DEFINED)
 app.include_router(api_router)
 
