@@ -81,6 +81,20 @@ const Dashboard = () => {
       action: () => navigate('/talent-compass'),
     },
     {
+      title: 'Explore Career Paths',
+      description: 'Discover your ideal career with IDFS Career Explorer',
+      icon: BriefcaseIcon,
+      color: 'bg-blue-600',
+      action: () => navigate('/career-explorer'),
+    },
+    {
+      title: 'IDFS Learning Pathways',
+      description: 'Access comprehensive educational pathways',
+      icon: AcademicCapIcon,
+      color: 'bg-green-600',
+      action: () => navigate('/learning-pathways'),
+    },
+    {
       title: 'Join Learning Circle',
       description: 'Connect with fellow learners in your field',
       icon: UserGroupIcon,
