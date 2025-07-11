@@ -111,6 +111,8 @@ const LearningPathways = () => {
         return <ChartBarIcon className="h-8 w-8" />;
       case 'social_justice':
         return <UserGroupIcon className="h-8 w-8" />;
+      case 'are_you_the_one':
+        return <StarIcon className="h-8 w-8" />;
       default:
         return <BookOpenIcon className="h-8 w-8" />;
     }
@@ -126,6 +128,8 @@ const LearningPathways = () => {
         return 'bg-purple-500';
       case 'social_justice':
         return 'bg-orange-500';
+      case 'are_you_the_one':
+        return 'bg-gradient-to-r from-purple-600 to-blue-600';
       default:
         return 'bg-gray-500';
     }
