@@ -34,6 +34,7 @@ class PathwayType(Enum):
     CAREER_ASSESSMENT = "career_assessment"
     SOCIAL_JUSTICE = "social_justice"
     COMMUNITY_SERVICE = "community_service"
+    ARE_YOU_THE_ONE = "are_you_the_one"  # IDFS Special Assessment Program
 
 @dataclass
 class ContentModule:
