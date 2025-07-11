@@ -1984,6 +1984,71 @@ async def get_voice_analytics(
         logger.error(f"Voice analytics error: {e}")
         raise HTTPException(status_code=500, detail="Failed to get voice analytics")
 
+@api_router.post("/ai/journal-insights")
+async def generate_journal_insights(
+    request: dict,
+    current_user: User = Depends(get_current_user)
+):
+    """Generate AI insights for journal entries"""
+    try:
+        entry_content = request.get('entry_content', '').strip()
+        entry_type = request.get('entry_type', 'reflection')
+        mood = request.get('mood', 'neutral')
+        tags = request.get('tags', [])
+        
+        if not entry_content:
+            raise HTTPException(status_code=400, detail="Entry content is required")
+        
+        # Use enhanced AI features for journal insights
+        if enhanced_emotional_intelligence:
+            insights = await enhanced_emotional_intelligence.generate_journal_insights(
+                content=entry_content,
+                context={
+                    'user_id': current_user.id,
+                    'entry_type': entry_type,
+                    'mood': mood,
+                    'tags': tags
+                }
+            )
+        else:
+            # Fallback insights
+            insights = f"Based on your {entry_type} entry about {', '.join(tags[:3]) if tags else 'your studies'}, " \
+                      f"here are some observations: Your {mood} mood suggests you're " \
+                      f"{'engaged and motivated' if mood in ['excited', 'confident'] else 'working through challenges' if mood in ['confused', 'frustrated'] else 'maintaining steady progress'}. " \
+                      f"Consider reflecting on what specific aspects triggered this feeling and how you can build on positive experiences or address difficulties."
+        
+        # Log the interaction for learning analytics
+        await log_journal_interaction(current_user.id, entry_content, insights, entry_type, mood)
+        
+        return {
+            "insights": insights,
+            "entry_type": entry_type,
+            "mood": mood,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Journal insights error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate journal insights")
+
+async def log_journal_interaction(user_id: str, content: str, insights: str, entry_type: str, mood: str):
+    """Log journal interaction for analytics"""
+    try:
+        interaction = {
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "interaction_type": "journal_insights",
+            "content": content,
+            "insights": insights,
+            "entry_type": entry_type,
+            "mood": mood,
+            "timestamp": datetime.utcnow()
+        }
+        
+        await db.journal_interactions.insert_one(interaction)
+    except Exception as e:
+        logger.error(f"Failed to log journal interaction: {e}")
+
 def extract_common_topics(questions):
     """Extract common topics from voice questions"""
     # Simple keyword extraction - could be enhanced with NLP
