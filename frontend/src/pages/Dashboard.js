@@ -24,6 +24,11 @@ import {
 } from '@heroicons/react/24/outline';
 import VoiceToTextLearning from '../components/VoiceToTextLearning';
 import HabitTracker from '../components/HabitTracker';
+import EmergencyHelpButton from '../components/EmergencyHelpButton';
+import LearningBattles from '../components/LearningBattles';
+import VirtualClassroomPet from '../components/VirtualClassroomPet';
+import ProgressCelebrations from '../components/ProgressCelebrations';
+import StudyJournal from '../components/StudyJournal';
 
 const Dashboard = () => {
   const { user } = useAuth();
