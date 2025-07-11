@@ -191,41 +191,39 @@ Critical login failure in PathwayIQ application - users cannot complete login pr
       message: "Backend authentication flow tested successfully. Issue is frontend-specific, not backend authentication."
 
 user_problem_statement: |
-  RESTORE STARGUIDE: Complete Educational Platform Recovery
-  Repository: https://github.com/idfuturestars/Emergent (branch: main0620256am)
-  Status: Successfully restored latest version from June 19, 2025
+  IDFS CONTENT INTEGRATION: Complete Integration of IDFS Educational Content
   
-  ✅ COMPLETED FEATURES (Restored):
-  - Authentication System with JWT tokens and role-based access (Student/Teacher/Admin)
-  - Adaptive SkillScan™ with real-time difficulty adjustment
-  - StarMentor™ AI Tutoring with OpenAI GPT-4 integration
-  - Advanced Adaptive Assessment Engine with Think-Aloud Mode
-  - AI Assistance Tracking with transparency scoring
-  - Grade Level Detection (K-PhD+)
-  - Study Groups and Learning Pods
-  - Quiz Arena (Battle System)
-  - Real-time Chat System
-  - Analytics Dashboard
-  - Badge System with multiple rarities
-  - XP and Leveling System
-  - Question Bank with multiple difficulty levels
-  - Database Models for all features
+  OBJECTIVE: Integrate 130+ PDF and DOCX files containing IDFS educational content into PathwayIQ
   
-  🎯 ADVANCED FEATURES AVAILABLE:
-  - Adaptive Engine with ability estimation
-  - Think-Aloud reasoning capture
-  - Multi-provider AI support (OpenAI, Claude, Gemini APIs configured)
-  - Real-time WebSocket communication
-  - Advanced analytics and progress tracking
-  - Comprehensive question types and difficulty scaling
+  CONTENT CATEGORIES:
+  - Vocational Training Pathways (Trade schools, skilled trades, salary information)
+  - Community College Pathways (2-year programs, transfer options, cost savings)
+  - Career Assessment Tools (Interest surveys, career cluster matching)
+  - Social Justice Education (Leadership, community impact, advocacy)
+  - College Transition Support (4-year college preparation, HBCU information)
+  - Community Service Learning (Civic engagement, nonprofit sector)
   
-  ⚡ NEXT ENHANCEMENTS TO IMPLEMENT:
-  Based on user's feature request list, prioritize:
-  1. Mobile-First Features (Offline Mode, Push Notifications)
-  2. Advanced AI Capabilities (Voice-to-Text, Emotional Intelligence)
-  3. Gamification 2.0 (Virtual Pets, Learning Battles, Seasonal Events)
-  4. Content Creation Tools (AI Content Generator)
-  5. Social Learning Evolution (Mentorship Matching)
+  INTEGRATION REQUIREMENTS:
+  1. Content Extraction: Parse PDF/DOCX files from GitHub repository
+  2. Database Integration: Store content in MongoDB with proper indexing
+  3. API Development: Create endpoints for content retrieval and search
+  4. Frontend Integration: Build user interfaces for pathway exploration
+  5. Career Assessment: Implement career interest surveys and recommendations
+  6. Learning Path Creation: Generate personalized learning pathways
+  
+  EDUCATIONAL ROUTES:
+  - Career Pathways: Vocational training, skilled trades, professional development
+  - K-12 Support: Educational preparation, college readiness, career exploration
+  - Graduate Programs: Advanced education pathways, specialized training
+  - Non-College Routes: Alternative education, entrepreneurship, self-directed learning
+  
+  SUCCESS CRITERIA:
+  - All 130+ documents processed and stored in database
+  - Content searchable and accessible through API endpoints
+  - Frontend interfaces for pathway exploration and career assessment
+  - Personalized learning pathway generation
+  - Career recommendation system based on user interests
+  - Integration with existing PathwayIQ features and authentication
 
 backend:
   - task: "FastAPI server with adaptive assessment engine"
