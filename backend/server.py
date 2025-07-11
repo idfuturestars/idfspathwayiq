@@ -1888,8 +1888,141 @@ async def submit_comprehensive_answer(
         raise HTTPException(status_code=500, detail="Failed to submit answer")
 
 # ============================================================================
-# ML-POWERED INSIGHTS & ANALYTICS SYSTEM
+# VOICE-TO-TEXT AND AI STUDY BUDDY ENDPOINTS
 # ============================================================================
+
+@api_router.post("/ai/voice-question")
+async def process_voice_question(
+    request: dict,
+    current_user: User = Depends(get_current_user)
+):
+    """Process voice question and provide AI Study Buddy response"""
+    try:
+        question = request.get('question', '').strip()
+        context = request.get('context', {})
+        
+        if not question:
+            raise HTTPException(status_code=400, detail="Question is required")
+        
+        # Use enhanced AI features for voice response
+        if enhanced_emotional_intelligence:
+            response = await enhanced_emotional_intelligence.generate_study_buddy_response(
+                question=question,
+                user_context={
+                    'user_id': current_user.id,
+                    'learning_style': context.get('learning_style', 'adaptive'),
+                    'difficulty_level': context.get('difficulty_level', 'intermediate')
+                }
+            )
+        else:
+            # Fallback response
+            response = f"I understand you're asking about: {question}. Let me help you with that. " \
+                      f"This is a great question that shows you're thinking critically about the topic. " \
+                      f"Would you like me to explain this concept step by step, or would you prefer a practical example?"
+        
+        # Log the interaction for learning analytics
+        await log_voice_interaction(current_user.id, question, response)
+        
+        return {
+            "response": response,
+            "question": question,
+            "timestamp": datetime.utcnow().isoformat(),
+            "interaction_type": "voice_study_buddy"
+        }
+        
+    except Exception as e:
+        logger.error(f"Voice question processing error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to process voice question")
+
+async def log_voice_interaction(user_id: str, question: str, response: str):
+    """Log voice interaction for analytics and learning insights"""
+    try:
+        interaction = {
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "interaction_type": "voice_study_buddy",
+            "question": question,
+            "response": response,
+            "timestamp": datetime.utcnow(),
+            "session_id": f"voice_{user_id}_{int(time.time())}"
+        }
+        
+        await db.voice_interactions.insert_one(interaction)
+    except Exception as e:
+        logger.error(f"Failed to log voice interaction: {e}")
+
+@api_router.get("/ai/voice-analytics/{user_id}")
+async def get_voice_analytics(
+    user_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get voice interaction analytics for user"""
+    try:
+        # Ensure user can only access their own analytics
+        if current_user.id != user_id and current_user.role != "admin":
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        # Get voice interactions from last 30 days
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        
+        interactions = await db.voice_interactions.find({
+            "user_id": user_id,
+            "timestamp": {"$gte": thirty_days_ago}
+        }).to_list(1000)
+        
+        analytics = {
+            "total_interactions": len(interactions),
+            "daily_average": len(interactions) / 30,
+            "most_common_topics": extract_common_topics([i["question"] for i in interactions]),
+            "engagement_trend": calculate_engagement_trend(interactions),
+            "learning_progress": assess_voice_learning_progress(interactions)
+        }
+        
+        return analytics
+        
+    except Exception as e:
+        logger.error(f"Voice analytics error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get voice analytics")
+
+def extract_common_topics(questions):
+    """Extract common topics from voice questions"""
+    # Simple keyword extraction - could be enhanced with NLP
+    keywords = {}
+    common_words = {'what', 'how', 'why', 'when', 'where', 'is', 'are', 'can', 'will', 'the', 'a', 'an'}
+    
+    for question in questions:
+        words = question.lower().split()
+        for word in words:
+            if len(word) > 3 and word not in common_words:
+                keywords[word] = keywords.get(word, 0) + 1
+    
+    return sorted(keywords.items(), key=lambda x: x[1], reverse=True)[:10]
+
+def calculate_engagement_trend(interactions):
+    """Calculate daily engagement trend"""
+    daily_counts = {}
+    for interaction in interactions:
+        date = interaction["timestamp"].date()
+        daily_counts[date] = daily_counts.get(date, 0) + 1
+    
+    return list(daily_counts.values())
+
+def assess_voice_learning_progress(interactions):
+    """Assess learning progress from voice interactions"""
+    if len(interactions) < 5:
+        return "insufficient_data"
+    
+    # Simple progress assessment based on interaction complexity and frequency
+    recent_interactions = sorted(interactions, key=lambda x: x["timestamp"])[-10:]
+    complexity_scores = [len(i["question"].split()) for i in recent_interactions]
+    avg_complexity = sum(complexity_scores) / len(complexity_scores)
+    
+    if avg_complexity > 10:
+        return "advanced"
+    elif avg_complexity > 6:
+        return "intermediate"
+    else:
+        return "beginner"
 
 @api_router.get("/analytics/dashboard")
 async def get_dashboard_analytics(current_user: User = Depends(get_current_user)):
