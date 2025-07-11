@@ -534,6 +534,11 @@ class IDFSContentManager:
                 search_filter['pathway_type'] = pathway_type
             
             results = await self.content_collection.find(search_filter).to_list(50)
+            
+            # Remove MongoDB _id fields to avoid serialization issues
+            for result in results:
+                result.pop("_id", None)
+            
             return results
             
         except Exception as e:
