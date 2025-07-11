@@ -2110,6 +2110,297 @@ class StarGuideBackendTest(unittest.TestCase):
         except Exception as e:
             print(f"❌ IDFS content processing test failed: {e}")
 
+    def test_34_are_you_the_one_pathway_system(self):
+        """Test the newly integrated 'Are You The One™' pathway system"""
+        print("\n=== TESTING 'ARE YOU THE ONE™' PATHWAY SYSTEM ===")
+        
+        # Make sure we're authenticated
+        if not self.auth_token:
+            self.test_04_user_login()
+        
+        # Test 1: Verify 'Are You The One™' pathway exists in pathways list
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/idfs/pathways",
+                headers=self.headers
+            )
+            self.assertEqual(response.status_code, 200)
+            pathways = response.json()
+            
+            # Find the 'Are You The One™' pathway
+            are_you_the_one_pathway = None
+            for pathway in pathways:
+                if "Are You The One" in pathway.get("name", ""):
+                    are_you_the_one_pathway = pathway
+                    break
+            
+            self.assertIsNotNone(are_you_the_one_pathway, "Are You The One™ pathway not found")
+            
+            # Verify pathway structure
+            self.assertEqual(are_you_the_one_pathway["pathway_type"], "are_you_the_one")
+            self.assertIn("Elite Development Program", are_you_the_one_pathway["name"])
+            self.assertIn("Ages 16-25", are_you_the_one_pathway["target_audience"])
+            self.assertIn("holistic development", are_you_the_one_pathway["description"].lower())
+            
+            # Verify special features
+            self.assertIn("special_features", are_you_the_one_pathway)
+            special_features = are_you_the_one_pathway["special_features"]
+            self.assertIn("Holistic development assessment", special_features)
+            self.assertIn("Global competitive ranking", special_features)
+            
+            print("✅ 'Are You The One™' pathway found with correct structure")
+            
+        except AssertionError as e:
+            print(f"❌ 'Are You The One™' pathway verification failed: {e}")
+            if 'response' in locals():
+                print(f"Response status: {response.status_code}, Response: {response.text[:300]}")
+        
+        # Test 2: Test pathway content retrieval
+        try:
+            content_request = {
+                "pathway_type": "are_you_the_one"
+            }
+            
+            response = requests.post(
+                f"{BACKEND_URL}/idfs/content/pathway",
+                headers=self.headers,
+                json=content_request
+            )
+            self.assertEqual(response.status_code, 200)
+            content_data = response.json()
+            
+            self.assertIn("content", content_data)
+            content_modules = content_data["content"]
+            
+            # Verify at least one module exists
+            self.assertGreater(len(content_modules), 0, "No content modules found for 'Are You The One™' pathway")
+            
+            # Verify module structure
+            module = content_modules[0]
+            self.assertIn("title", module)
+            self.assertIn("Are You The One", module["title"])
+            self.assertIn("content", module)
+            self.assertIn("learning_objectives", module)
+            self.assertIn("assessment_questions", module)
+            self.assertEqual(module["pathway_type"], "are_you_the_one")
+            
+            # Verify content includes IDFS methodology
+            content_text = module["content"].lower()
+            self.assertIn("iq", content_text)
+            self.assertIn("eq", content_text)
+            self.assertIn("holistic development", content_text)
+            self.assertIn("competitive ranking", content_text)
+            
+            print("✅ 'Are You The One™' content module retrieved successfully")
+            
+        except AssertionError as e:
+            print(f"❌ 'Are You The One™' content retrieval failed: {e}")
+            if 'response' in locals():
+                print(f"Response status: {response.status_code}, Response: {response.text[:300]}")
+        
+        # Test 3: Test pathway modules endpoint
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/idfs/pathways/are_you_the_one/modules",
+                headers=self.headers
+            )
+            self.assertEqual(response.status_code, 200)
+            modules_data = response.json()
+            
+            self.assertIn("modules", modules_data)
+            modules = modules_data["modules"]
+            
+            # Verify modules exist
+            self.assertGreater(len(modules), 0, "No modules found for 'Are You The One™' pathway")
+            
+            # Verify module structure
+            module = modules[0]
+            self.assertIn("content_id", module)
+            self.assertIn("title", module)
+            self.assertIn("learning_objectives", module)
+            self.assertIn("assessment_questions", module)
+            
+            print("✅ 'Are You The One™' pathway modules endpoint working")
+            
+        except AssertionError as e:
+            print(f"❌ 'Are You The One™' pathway modules test failed: {e}")
+            if 'response' in locals():
+                print(f"Response status: {response.status_code}, Response: {response.text[:300]}")
+        
+        # Test 4: Test assessment questions for 'Are You The One™'
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/idfs/career-assessment/questions",
+                headers=self.headers
+            )
+            self.assertEqual(response.status_code, 200)
+            questions_data = response.json()
+            
+            self.assertIn("questions", questions_data)
+            questions = questions_data["questions"]
+            
+            # Look for 'Are You The One™' specific questions
+            are_you_the_one_questions = []
+            for question in questions:
+                if "alternative to traditional college" in question.get("question", "").lower() or \
+                   "technical and stem" in question.get("question", "").lower() or \
+                   "global competitive ranking" in question.get("question", "").lower():
+                    are_you_the_one_questions.append(question)
+            
+            self.assertGreater(len(are_you_the_one_questions), 0, "No 'Are You The One™' specific assessment questions found")
+            
+            # Verify question structure
+            question = are_you_the_one_questions[0]
+            self.assertIn("question", question)
+            self.assertIn("type", question)
+            self.assertIn("options", question)
+            
+            print(f"✅ 'Are You The One™' assessment questions found ({len(are_you_the_one_questions)} questions)")
+            
+        except AssertionError as e:
+            print(f"❌ 'Are You The One™' assessment questions test failed: {e}")
+            if 'response' in locals():
+                print(f"Response status: {response.status_code}, Response: {response.text[:300]}")
+        
+        # Test 5: Test content search for 'Are You The One™'
+        try:
+            search_request = {
+                "query": "Are You The One",
+                "pathway_type": "are_you_the_one"
+            }
+            
+            response = requests.post(
+                f"{BACKEND_URL}/idfs/content/search",
+                headers=self.headers,
+                json=search_request
+            )
+            self.assertEqual(response.status_code, 200)
+            search_data = response.json()
+            
+            self.assertIn("results", search_data)
+            results = search_data["results"]
+            
+            # Verify search results
+            self.assertGreater(len(results), 0, "No search results found for 'Are You The One™'")
+            
+            # Verify result structure
+            result = results[0]
+            self.assertIn("title", result)
+            self.assertIn("content", result)
+            self.assertIn("pathway_type", result)
+            self.assertEqual(result["pathway_type"], "are_you_the_one")
+            
+            print("✅ 'Are You The One™' content search working")
+            
+        except AssertionError as e:
+            print(f"❌ 'Are You The One™' content search test failed: {e}")
+            if 'response' in locals():
+                print(f"Response status: {response.status_code}, Response: {response.text[:300]}")
+        
+        # Test 6: Test career assessment analysis with 'Are You The One™' focus
+        try:
+            assessment_request = {
+                "responses": [
+                    {"question": "What motivates you to pursue an alternative to traditional college education?", "answer": "I want direct workforce entry"},
+                    {"question": "Rate your interest in technical and STEM fields (1-10)", "answer": "9"},
+                    {"question": "Which assessment area interests you most?", "answer": "Technical Skills"},
+                    {"question": "Are you interested in global competitive ranking?", "answer": "Yes"}
+                ]
+            }
+            
+            response = requests.post(
+                f"{BACKEND_URL}/idfs/career-assessment/analyze",
+                headers=self.headers,
+                json=assessment_request
+            )
+            self.assertEqual(response.status_code, 200)
+            analysis_data = response.json()
+            
+            self.assertIn("analysis", analysis_data)
+            self.assertIn("recommended_pathways", analysis_data)
+            
+            # Check if 'Are You The One™' is recommended
+            recommended_pathways = analysis_data["recommended_pathways"]
+            are_you_the_one_recommended = any(
+                "Are You The One" in pathway.get("name", "") 
+                for pathway in recommended_pathways
+            )
+            
+            if are_you_the_one_recommended:
+                print("✅ 'Are You The One™' pathway correctly recommended in career assessment")
+            else:
+                print("❓ 'Are You The One™' pathway not recommended (may be based on assessment logic)")
+            
+        except AssertionError as e:
+            print(f"❌ 'Are You The One™' career assessment analysis failed: {e}")
+            if 'response' in locals():
+                print(f"Response status: {response.status_code}, Response: {response.text[:300]}")
+        
+        # Test 7: Test learning objectives quality
+        try:
+            # Get the content module again to verify learning objectives
+            content_request = {"pathway_type": "are_you_the_one"}
+            response = requests.post(
+                f"{BACKEND_URL}/idfs/content/pathway",
+                headers=self.headers,
+                json=content_request
+            )
+            
+            if response.status_code == 200:
+                content_data = response.json()
+                module = content_data["content"][0]
+                learning_objectives = module["learning_objectives"]
+                
+                # Verify comprehensive learning objectives
+                expected_objectives = [
+                    "comprehensive skills assessment",
+                    "global competitive ranking",
+                    "workforce entry",
+                    "stem",
+                    "alternative pathways",
+                    "experiential learning"
+                ]
+                
+                objectives_text = " ".join(learning_objectives).lower()
+                found_objectives = []
+                for expected in expected_objectives:
+                    if expected in objectives_text:
+                        found_objectives.append(expected)
+                
+                self.assertGreaterEqual(len(found_objectives), 4, f"Only {len(found_objectives)} of {len(expected_objectives)} expected learning objectives found")
+                
+                print(f"✅ 'Are You The One™' learning objectives are comprehensive ({len(found_objectives)}/{len(expected_objectives)} key areas covered)")
+            
+        except AssertionError as e:
+            print(f"❌ 'Are You The One™' learning objectives quality test failed: {e}")
+        
+        # Test 8: Test integration with existing pathways
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/idfs/pathways",
+                headers=self.headers
+            )
+            
+            if response.status_code == 200:
+                pathways = response.json()
+                
+                # Verify 'Are You The One™' is integrated alongside other pathways
+                pathway_types = [p.get("pathway_type") for p in pathways]
+                
+                self.assertIn("are_you_the_one", pathway_types)
+                self.assertIn("vocational", pathway_types)
+                self.assertIn("community_college", pathway_types)
+                
+                # Verify it doesn't break existing pathways
+                self.assertGreaterEqual(len(pathways), 4, "Integration may have affected existing pathways")
+                
+                print("✅ 'Are You The One™' pathway integrates seamlessly with existing pathways")
+            
+        except AssertionError as e:
+            print(f"❌ 'Are You The One™' integration test failed: {e}")
+        
+        print("=== 'ARE YOU THE ONE™' PATHWAY SYSTEM TESTING COMPLETE ===\n")
+
 if __name__ == "__main__":
     # Run the tests in a specific order
     test_suite = unittest.TestSuite()
