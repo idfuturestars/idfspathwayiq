@@ -521,6 +521,21 @@ const Dashboard = () => {
 
       {/* Habit Tracker Section */}
       <HabitTracker className="mb-8" />
+
+      {/* Virtual Classroom Pet */}
+      <VirtualClassroomPet className="mb-8" />
+
+      {/* Learning Battles */}
+      <LearningBattles className="mb-8" />
+
+      {/* Progress Celebrations */}
+      <ProgressCelebrations className="mb-8" />
+
+      {/* Study Journal */}
+      <StudyJournal className="mb-8" />
+
+      {/* Emergency Help Button - Fixed position */}
+      <EmergencyHelpButton />
     </div>
   );
 };
