@@ -497,6 +497,32 @@ class IDFSContentManager:
                     ],
                     'modules': await self.get_modules_by_type(PathwayType.SOCIAL_JUSTICE),
                     'created_at': datetime.now()
+                },
+                {
+                    'pathway_id': str(uuid.uuid4()),
+                    'name': 'Are You The One™ - Elite Development Program',
+                    'description': 'Holistic development and competitive assessment for ages 16-25, focusing on IQ, EQ, and workforce readiness',
+                    'pathway_type': PathwayType.ARE_YOU_THE_ONE.value,
+                    'duration': '6 months - 1 year',
+                    'target_audience': 'Ages 16-25, high achievers, career-focused individuals',
+                    'learning_outcomes': [
+                        'Comprehensive skills assessment (IQ, EQ, technical)',
+                        'Global competitive ranking and benchmarking',
+                        'Direct workforce entry preparation',
+                        'STEM and technical skills development',
+                        'Alternative pathway to traditional college',
+                        'Experiential learning and real-world application'
+                    ],
+                    'modules': await self.get_modules_by_type(PathwayType.ARE_YOU_THE_ONE),
+                    'created_at': datetime.now(),
+                    'special_features': [
+                        'Holistic development assessment',
+                        'Global competitive ranking',
+                        'Technical and cognitive evaluation',
+                        'Career pathway matching',
+                        'Alternative education pathway',
+                        'Direct industry connections'
+                    ]
                 }
             ]
             
