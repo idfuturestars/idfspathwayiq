@@ -500,6 +500,10 @@ class IDFSContentManager:
                 {'pathway_type': pathway_type}
             ).to_list(100)
             
+            # Remove MongoDB _id fields to avoid serialization issues
+            for module in modules:
+                module.pop("_id", None)
+            
             return modules
             
         except Exception as e:
