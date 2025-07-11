@@ -28,23 +28,40 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  // Load user on mount
+  // Load user on mount with aggressive error handling and debugging
   useEffect(() => {
     const loadUser = async () => {
+      console.log('🔍 AuthContext: Starting loadUser, token:', token ? 'present' : 'missing');
+      
       if (token) {
         try {
+          console.log('🔑 AuthContext: Making request to /api/auth/me');
           const response = await axios.get(`${API_URL}/api/auth/me`);
+          console.log('✅ AuthContext: User data received:', response.data);
           setUser(response.data);
         } catch (error) {
-          console.error('Failed to load user:', error);
+          console.error('❌ AuthContext: Failed to load user:', error);
+          console.log('🧹 AuthContext: Clearing invalid token');
           localStorage.removeItem('token');
           setToken(null);
         }
+      } else {
+        console.log('⏭️ AuthContext: No token, skipping user load');
       }
+      
+      console.log('✅ AuthContext: Setting loading to false');
       setLoading(false);
     };
 
-    loadUser();
+    // Add timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.log('⚠️ AuthContext: LoadUser timeout, forcing loading to false');
+      setLoading(false);
+    }, 10000); // 10 second timeout
+
+    loadUser().finally(() => {
+      clearTimeout(timeoutId);
+    });
   }, [token]);
 
   const login = async (email, password) => {
