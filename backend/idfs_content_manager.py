@@ -642,3 +642,131 @@ class IDFSContentManager:
         except Exception as e:
             logger.error(f"Error getting salary insights: {str(e)}")
             return {}
+
+    async def create_are_you_the_one_module(self):
+        """Create the special 'Are You The One™' content module from IDFS website data"""
+        try:
+            logger.info("Creating 'Are You The One™' content module...")
+            
+            # Get the external content configuration
+            external_content = self.content_categories["are_you_the_one"]["external_content"]
+            
+            # Create comprehensive content text
+            content_text = f"""
+            {external_content['name']} - Elite Development Program
+
+            TARGET AUDIENCE: {external_content['target_audience']}
+            
+            PURPOSE: {external_content['purpose']}
+
+            PROGRAM OVERVIEW:
+            The 'Are You The One™' program is designed to identify and support holistic development by integrating academic and special talents in a competitive environment. This breakthrough program creates a path where each individual's IQ, EQ, transactional, technological, and problem-solving assets are tested and measured against students globally to achieve comprehensive ranking.
+
+            METHODOLOGY:
+            {external_content['methodology']['approach']}
+
+            EVALUATION COMPONENTS:
+            """
+            
+            for component in external_content['methodology']['evaluation_components']:
+                content_text += f"• {component}\n"
+            
+            content_text += f"""
+            
+            FOCUS AREAS:
+            """
+            for area in external_content['focus_areas']:
+                content_text += f"• {area}\n"
+            
+            content_text += f"""
+            
+            UNIQUE FEATURES:
+            """
+            for feature in external_content['unique_features']:
+                content_text += f"• {feature}\n"
+            
+            content_text += """
+            
+            CAREER DEVELOPMENT APPROACH:
+            The program prepares students for successful careers in technical and vocational fields, emphasizing hands-on experience and direct pathways into the workforce. Students can leapfrog traditional college education while still achieving career success.
+
+            PATHWAY SELECTION GUIDANCE:
+            Students are guided towards careers that align with their skills and passions, with a focus on STEM and technical trades, ensuring they are workforce-ready upon completion.
+
+            COMPETITIVE ADVANTAGE:
+            Unlike traditional educational pathways, this program provides global benchmarking and competitive ranking, giving students a clear understanding of their position and potential in the global marketplace.
+
+            ALTERNATIVE EDUCATION MODEL:
+            For students aged 16-25, this program offers a viable alternative to traditional college education, focusing on practical skills, real-world application, and direct industry connections.
+            """
+            
+            # Create the content module
+            module = ContentModule(
+                id=str(uuid.uuid4()),
+                title="Are You The One™ - Elite Development Program",
+                pathway_type=PathwayType.ARE_YOU_THE_ONE,
+                content=content_text.strip(),
+                learning_objectives=[
+                    "Complete comprehensive skills assessment across IQ, EQ, and technical domains",
+                    "Achieve global competitive ranking and benchmarking",
+                    "Develop direct workforce entry capabilities",
+                    "Master STEM and technical skills for career success",
+                    "Explore alternative pathways to traditional college education",
+                    "Gain experiential learning and real-world application skills"
+                ],
+                prerequisites=["Ages 16-25", "High school level education", "Commitment to intensive assessment"],
+                estimated_duration="6 months - 1 year",
+                difficulty_level="Advanced",
+                salary_info={
+                    "note": "Varies by chosen career path",
+                    "potential": "Direct entry into high-paying technical and STEM careers"
+                },
+                career_clusters=external_content['focus_areas'],
+                assessment_questions=[
+                    {
+                        "question": "What motivates you to pursue an alternative to traditional college education?",
+                        "type": "open_ended",
+                        "options": []
+                    },
+                    {
+                        "question": "Rate your interest in technical and STEM fields (1-10)",
+                        "type": "rating_scale",
+                        "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+                    },
+                    {
+                        "question": "Which assessment area interests you most?",
+                        "type": "multiple_choice",
+                        "options": [
+                            "Cognitive Abilities (IQ)",
+                            "Emotional Intelligence (EQ)", 
+                            "Technical Skills",
+                            "Problem-Solving Capabilities",
+                            "Social Competence"
+                        ]
+                    },
+                    {
+                        "question": "Are you interested in global competitive ranking?",
+                        "type": "yes_no",
+                        "options": ["Yes", "No"]
+                    }
+                ],
+                resources=[
+                    {
+                        "title": "IDFS Official Website",
+                        "url": "https://www.idfuturestars.com"
+                    },
+                    {
+                        "title": "Are You The One™ Service Page",
+                        "url": "https://www.idfuturestars.com/service/are-you-the-one-tm"
+                    }
+                ],
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
+            
+            # Save the module
+            await self.save_content_module(module)
+            logger.info("Successfully created 'Are You The One™' content module")
+            
+        except Exception as e:
+            logger.error(f"Error creating 'Are You The One™' module: {str(e)}")
