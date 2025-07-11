@@ -1737,6 +1737,12 @@ if __name__ == "__main__":
     test_suite.addTest(StarGuideBackendTest('test_19_cors_handling'))
     test_suite.addTest(StarGuideBackendTest('test_20_phase_2_1_advanced_infrastructure'))
     test_suite.addTest(StarGuideBackendTest('test_21_phase_2_2_technical_infrastructure'))
+    test_suite.addTest(StarGuideBackendTest('test_22_phase_2_3_voice_to_text_ai_study_buddy'))
+    test_suite.addTest(StarGuideBackendTest('test_23_phase_2_3_journal_insights_system'))
+    test_suite.addTest(StarGuideBackendTest('test_24_phase_2_3_enhanced_assessment_system'))
+    test_suite.addTest(StarGuideBackendTest('test_25_phase_2_3_authentication_authorization'))
+    test_suite.addTest(StarGuideBackendTest('test_26_phase_2_3_core_api_endpoints'))
+    test_suite.addTest(StarGuideBackendTest('test_27_phase_2_3_backend_integrations'))
     
     runner = unittest.TextTestRunner()
     runner.run(test_suite)
