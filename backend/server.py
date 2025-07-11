@@ -75,6 +75,9 @@ from learning_path_engine import (
     learning_path_engine, LearningGoal, LearningGoalType, PathwayType
 )
 
+# IDFS Content Integration
+from idfs_content_manager import IDFSContentManager
+
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
