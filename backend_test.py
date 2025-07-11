@@ -16,7 +16,7 @@ import sys
 import base64
 
 # Get the backend URL from the frontend .env file
-BACKEND_URL = "https://a5350564-e224-4461-b075-455cf1ca02d8.preview.emergentagent.com/api"
+BACKEND_URL = "https://f06e2f74-180c-4b41-b48d-724554ebd962.preview.emergentagent.com/api"
 
 class StarGuideBackendTest(unittest.TestCase):
     """Test suite for StarGuide backend API"""

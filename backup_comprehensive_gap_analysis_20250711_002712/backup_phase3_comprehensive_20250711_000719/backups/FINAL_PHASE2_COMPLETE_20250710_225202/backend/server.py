@@ -261,7 +261,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "https://localhost:3000", 
-        "https://66256085-2a0b-48ac-a1c3-b48878d22fc4.preview.emergentagent.com",  # Development domain
+        "https://f06e2f74-180c-4b41-b48d-724554ebd962.preview.emergentagent.com",  # Development domain
         "https://emergency-stargate.emergent.host",  # Current operational domain
         "https://stargateai.emergent.host",  # Target production domain
         "https://*.emergent.host",  # Wildcard for all emergent subdomains

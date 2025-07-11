@@ -10,8 +10,8 @@ import time
 from datetime import datetime
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://a5350564-e224-4461-b075-455cf1ca02d8.preview.emergentagent.com/api"
-FRONTEND_URL = "https://a5350564-e224-4461-b075-455cf1ca02d8.preview.emergentagent.com"
+BACKEND_URL = "https://f06e2f74-180c-4b41-b48d-724554ebd962.preview.emergentagent.com/api"
+FRONTEND_URL = "https://f06e2f74-180c-4b41-b48d-724554ebd962.preview.emergentagent.com"
 
 def test_frontend_auth_flow():
     """Test the exact authentication flow that frontend would use"""
