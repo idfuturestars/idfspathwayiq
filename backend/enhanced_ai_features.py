@@ -426,6 +426,128 @@ class EnhancedEmotionalIntelligence:
         
         return intervention
 
+    async def generate_study_buddy_response(self, question: str, user_context: dict) -> str:
+        """Generate AI Study Buddy response for voice questions"""
+        try:
+            # Check if OpenAI client is available
+            if not self.openai_client:
+                return self._generate_fallback_study_response(question)
+            
+            # Create context-aware prompt
+            prompt = f"""You are an AI Study Buddy designed to help students learn effectively. 
+            
+Student Question: {question}
+User Context: {user_context}
+
+Please provide a helpful, encouraging, and educational response that:
+1. Directly addresses their question
+2. Explains concepts in simple terms
+3. Provides examples or analogies
+4. Offers different ways to understand the topic
+5. Encourages further learning
+
+Keep your response conversational and supportive, as if you're a friendly tutor."""
+
+            response = self.openai_client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a supportive AI Study Buddy that helps students learn by explaining concepts clearly and encouraging their curiosity."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=300,
+                temperature=0.7
+            )
+            
+            return response.choices[0].message.content.strip()
+            
+        except Exception as e:
+            logger.error(f"Error generating study buddy response: {e}")
+            return self._generate_fallback_study_response(question)
+    
+    def _generate_fallback_study_response(self, question: str) -> str:
+        """Generate fallback response when AI is not available"""
+        responses = [
+            f"That's a great question about {question}! Let me help you understand this better. Could you tell me what specific part is confusing you?",
+            f"I can see you're thinking about {question}. This is an important topic! Would you like me to break it down into smaller parts?",
+            f"Excellent question! {question} is something many students ask about. Let's explore this together - what do you already know about this topic?",
+            f"You're asking about {question} - that shows great curiosity! Let me explain this in a way that might help you understand it better.",
+        ]
+        import random
+        return random.choice(responses)
+            
+    async def generate_journal_insights(self, content: str, context: dict) -> str:
+        """Generate AI insights for journal entries"""
+        try:
+            # Check if OpenAI client is available
+            if not self.openai_client:
+                return self._generate_fallback_journal_insights(content, context)
+            
+            # Create context-aware prompt for journal insights
+            prompt = f"""You are an AI learning coach analyzing a student's journal entry. 
+            
+Journal Entry: {content}
+Entry Type: {context.get('entry_type', 'reflection')}
+Student's Mood: {context.get('mood', 'neutral')}
+Tags: {', '.join(context.get('tags', []))}
+
+Please provide thoughtful insights that:
+1. Acknowledge the student's current emotional state and learning progress
+2. Identify patterns or themes in their learning journey
+3. Offer constructive feedback and encouragement
+4. Suggest specific strategies for improvement or next steps
+5. Help them reflect deeper on their learning experience
+
+Keep your response supportive, personalized, and focused on growth mindset."""
+
+            response = self.openai_client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a supportive AI learning coach that helps students reflect on their learning journey through thoughtful insights and guidance."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=250,
+                temperature=0.7
+            )
+            
+            return response.choices[0].message.content.strip()
+            
+        except Exception as e:
+            logger.error(f"Error generating journal insights: {e}")
+            return self._generate_fallback_journal_insights(content, context)
+    
+    def _generate_fallback_journal_insights(self, content: str, context: dict) -> str:
+        """Generate fallback insights when AI is not available"""
+        entry_type = context.get('entry_type', 'reflection')
+        mood = context.get('mood', 'neutral')
+        tags = context.get('tags', [])
+        
+        mood_insights = {
+            'excited': "Your excitement is wonderful to see! This positive energy is a great foundation for learning. Try to identify what specifically sparked this enthusiasm so you can replicate it.",
+            'confident': "Your confidence shows you're building solid understanding. This is excellent progress! Consider teaching or explaining these concepts to others to reinforce your knowledge.",
+            'neutral': "Steady progress is valuable progress. Sometimes the most important learning happens in these consistent, focused sessions. Keep building those foundations.",
+            'confused': "Confusion is a natural part of learning - it means you're encountering new ideas! Try breaking down complex concepts into smaller pieces and don't hesitate to ask for help.",
+            'frustrated': "Frustration can be challenging, but it often precedes breakthrough moments. Take breaks when needed, try different approaches, and remember that struggle is part of growth."
+        }
+        
+        type_insights = {
+            'reflection': "Self-reflection is a powerful learning tool. You're developing metacognitive skills that will serve you well.",
+            'lesson_notes': "Taking notes shows you're actively engaging with the material. Consider reviewing and summarizing key points regularly.",
+            'question': "Asking questions demonstrates curiosity and critical thinking. These questions will guide your future learning.",
+            'insight': "Capturing insights helps solidify your understanding. Try connecting these insights to previous knowledge.",
+            'struggle': "Documenting challenges is wise - it helps you track progress and develop problem-solving strategies.",
+            'goal': "Setting goals provides direction for your learning journey. Make sure they're specific and achievable."
+        }
+        
+        base_insight = mood_insights.get(mood, mood_insights['neutral'])
+        type_insight = type_insights.get(entry_type, type_insights['reflection'])
+        
+        if tags:
+            tag_insight = f" Your focus on {', '.join(tags[:3])} shows you're building expertise in specific areas."
+        else:
+            tag_insight = ""
+        
+        return f"{base_insight} {type_insight}{tag_insight} Keep up the great work with your learning journal!"
+
 class AdvancedVoiceToText:
     """Advanced voice-to-text with emotional and cognitive analysis"""
     
